@@ -17,7 +17,8 @@
     <link rel="icon" href="{{ asset('icons/mansavibes-icon.svg') }}" type="image/svg+xml">
     <link rel="apple-touch-icon" href="{{ asset('icons/mansavibes-icon.svg') }}">
 
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    <script src="{{ asset('js/app.js') }}" defer></script>
 </head>
 <body class="min-h-screen bg-mansa-black text-white antialiased font-sans">
     <div class="absolute inset-0 overflow-hidden pointer-events-none">
