@@ -1,0 +1,59 @@
+{
+  "id": "/",
+  "name": "MANSA VIBES — Atelier connecté",
+  "short_name": "MansaVibes",
+  "description": "Digitalisez votre atelier de couture : clients, commandes, mensurations, finances.",
+  "start_url": "/?utm_source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "display_override": ["standalone", "browser"],
+  "orientation": "any",
+  "background_color": "#0a0a0a",
+  "theme_color": "#c5a028",
+  "lang": "fr",
+  "dir": "ltr",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "/icons/mansavibes-icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/mansavibes-icon.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/favicon.ico",
+      "sizes": "48x48",
+      "type": "image/x-icon",
+      "purpose": "any"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Tableau de bord",
+      "short_name": "Accueil",
+      "description": "Ouvrir le tableau de bord",
+      "url": "/dashboard?utm_source=pwa_shortcut",
+      "icons": [{ "src": "/icons/mansavibes-icon.svg", "sizes": "512x512", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "Clients",
+      "short_name": "Clients",
+      "description": "Liste des clients",
+      "url": "/clients?utm_source=pwa_shortcut",
+      "icons": [{ "src": "/icons/mansavibes-icon.svg", "sizes": "512x512", "type": "image/svg+xml" }]
+    },
+    {
+      "name": "Espace tailleur",
+      "short_name": "Tailleur",
+      "description": "Commandes assignées",
+      "url": "/espace-tailleur?utm_source=pwa_shortcut",
+      "icons": [{ "src": "/icons/mansavibes-icon.svg", "sizes": "512x512", "type": "image/svg+xml" }]
+    }
+  ]
+}
