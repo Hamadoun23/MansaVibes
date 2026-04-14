@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
-use App\Models\Tenant;
+use App\Models\AppSettings;
 use App\Services\FinanceAnalyticsService;
 use Carbon\Carbon;
 use Illuminate\Http\RedirectResponse;
@@ -25,14 +25,12 @@ class FinanceController extends Controller
             [$from, $to] = [$to->copy()->startOfDay(), $from->copy()->endOfDay()];
         }
 
-        $tenant = $request->user()->tenant;
-        $settings = $tenant->settings ?? [];
+        $settings = AppSettings::settingsArray();
 
         $analytics = new FinanceAnalyticsService(
-            (int) $tenant->id,
             $from,
             $to,
-            is_array($settings) ? $settings : []
+            $settings
         );
 
         $report = $analytics->snapshot();
@@ -41,7 +39,7 @@ class FinanceController extends Controller
             'report' => $report,
             'from' => $from,
             'to' => $to,
-            'settings' => is_array($settings) ? $settings : [],
+            'settings' => $settings,
         ]);
     }
 
@@ -53,13 +51,12 @@ class FinanceController extends Controller
             'finance_risk_growth_percent' => ['required', 'integer', 'min:-50', 'max:100'],
         ]);
 
-        /** @var Tenant $tenant */
-        $tenant = $request->user()->tenant;
-        $settings = is_array($tenant->settings) ? $tenant->settings : [];
+        $app = AppSettings::query()->firstOrFail();
+        $settings = is_array($app->settings) ? $app->settings : [];
         $settings['finance_margin_percent'] = (int) $data['finance_margin_percent'];
         $settings['finance_fixed_monthly_cents'] = (int) round((float) $data['finance_fixed_monthly_fcfa'] * 100);
         $settings['finance_risk_growth_percent'] = (int) $data['finance_risk_growth_percent'];
-        $tenant->update(['settings' => $settings]);
+        $app->update(['settings' => $settings]);
 
         return redirect()->route('finance.index', $request->only(['from', 'to']))->with('status', 'Paramètres financiers enregistrés.');
     }

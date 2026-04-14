@@ -2,16 +2,14 @@
 
 return [
 
-    /*
+ /*
     |--------------------------------------------------------------------------
-    | Mode instance unique (un seul atelier)
+    | Paramètres généraux (instance unique)
     |--------------------------------------------------------------------------
     |
-    | Si défini, ce tenant est toujours actif pour toute la requête (y compris
-    | visiteurs non connectés), ce qui évite les erreurs sans contexte tenant.
-    | Mettre null pour retrouver le mode multi-tenant par utilisateur.
+    | Le nom de l’atelier et les réglages métiers (ex. finance) sont stockés
+    | en base dans la table app_settings (voir App\Models\AppSettings).
     |
     */
-    'single_tenant_id' => env('MANSAVIBES_SINGLE_TENANT_ID', 3),
 
 ];

@@ -2,8 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\AppSettings;
 use App\Models\Employee;
-use App\Models\Tenant;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -12,18 +12,10 @@ class AlassaneTailleurSeeder extends Seeder
 {
     public function run(): void
     {
-        $tenant = Tenant::query()->find(3);
-        if ($tenant === null) {
-            $this->command?->warn('Aucun tenant id=3 : créez d’abord la boutique ou ajustez l’id dans AlassaneTailleurSeeder.');
-
-            return;
-        }
-
-        $tenant->name = 'Vetement Palace';
-        if (! Tenant::query()->where('slug', 'vetement-palace')->where('id', '!=', $tenant->id)->exists()) {
-            $tenant->slug = 'vetement-palace';
-        }
-        $tenant->save();
+        AppSettings::query()->updateOrCreate(
+            ['id' => 1],
+            ['business_name' => 'Vetement Palace']
+        );
 
         $newEmail = 'alassane@vp.com';
         $legacyEmail = 'alassane@vetement-palace.local';
@@ -40,16 +32,14 @@ class AlassaneTailleurSeeder extends Seeder
         $user = User::query()->updateOrCreate(
             ['email' => $newEmail],
             [
-                'tenant_id' => $tenant->id,
                 'name' => $newEmail,
                 'password' => Hash::make('AlascoVP'),
                 'role' => 'tailleur',
             ]
         );
 
-        Employee::query()->withoutGlobalScopes()->updateOrCreate(
+        Employee::query()->updateOrCreate(
             [
-                'tenant_id' => $tenant->id,
                 'user_id' => $user->id,
             ],
             [
@@ -59,6 +49,6 @@ class AlassaneTailleurSeeder extends Seeder
             ]
         );
 
-        $this->command?->info('Tailleur prêt (boutique id3 — Vetement Palace). Connexion : '.$newEmail.' / AlascoVP');
+        $this->command?->info('Tailleur prêt (Vetement Palace). Connexion : '.$newEmail.' / AlascoVP');
     }
 }

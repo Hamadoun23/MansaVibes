@@ -16,7 +16,7 @@ class TailorClientMeasurementController extends ClientController
     {
         abort_unless(request()->user()?->role === 'tailleur', 403);
 
-        MeasurementFormTemplate::ensureDefaultsForAuthenticatedTenant();
+        MeasurementFormTemplate::ensureDefaultsIfNeeded();
 
         $templates = MeasurementFormTemplate::query()
             ->where('is_active', true)
@@ -31,8 +31,6 @@ class TailorClientMeasurementController extends ClientController
     {
         abort_unless($request->user()->role === 'tailleur', 403);
 
-        $tenantId = (int) $request->user()->tenant_id;
-
         $clientFields = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'phone' => ['nullable', 'string', 'max:50'],
@@ -40,7 +38,7 @@ class TailorClientMeasurementController extends ClientController
             'notes' => ['nullable', 'string'],
             'measurement_form_template_id' => [
                 'required',
-                Rule::exists('measurement_form_templates', 'id')->where(fn ($q) => $q->where('tenant_id', $tenantId)),
+                'exists:measurement_form_templates,id',
             ],
         ]);
 

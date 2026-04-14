@@ -11,7 +11,7 @@
                 <div class="shrink-0 flex items-center">
                     <a href="{{ auth()->user()->role === 'tailleur' ? route('tailor.workspace') : route('dashboard') }}" class="flex flex-col leading-tight">
                         <span class="text-sm font-bold tracking-tight text-white">MANSA <span class="text-gold-400">VIBES</span></span>
-                        <span class="text-[10px] text-gold-500/70 uppercase tracking-wider">{{ \App\Support\CurrentTenant::get()?->name ?? auth()->user()->tenant->name ?? '' }}</span>
+                        <span class="text-[10px] text-gold-500/70 uppercase tracking-wider">{{ \App\Models\AppSettings::businessName() }}</span>
                     </a>
                 </div>
 

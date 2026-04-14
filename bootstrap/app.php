@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Middleware\PreventTailleur;
-use App\Http\Middleware\SetCurrentTenant;
 use App\Http\Middleware\SetLocaleFromSession;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -16,12 +15,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
-            'tenant' => SetCurrentTenant::class,
             'prevent.tailleur' => PreventTailleur::class,
         ]);
         $middleware->web(append: [
             SetLocaleFromSession::class,
-            SetCurrentTenant::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

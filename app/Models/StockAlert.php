@@ -2,16 +2,12 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class StockAlert extends Model
 {
-    use BelongsToTenant;
-
     protected $fillable = [
-        'tenant_id',
         'inventory_item_id',
         'threshold',
         'active',

@@ -19,8 +19,6 @@ class StaffWebController extends Controller
 
     public function updateSalary(Request $request, Employee $employee): RedirectResponse
     {
-        abort_unless((int) $employee->tenant_id === (int) $request->user()->tenant_id, 403);
-
         $data = $request->validate([
             'monthly_salary_fcfa' => ['nullable', 'numeric', 'min:0'],
         ]);

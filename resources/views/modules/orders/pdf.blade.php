@@ -16,7 +16,7 @@
 </head>
 <body>
     @php
-        $issuerName = $order->tenant?->name ?? config('app.name', 'Mansa Vibes');
+        $issuerName = \App\Models\AppSettings::businessName();
     @endphp
     <div style="margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid #ccc;">
         <h1 style="margin:0 0 4px;font-size:17px;">{{ $issuerName }}</h1>

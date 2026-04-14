@@ -41,7 +41,7 @@ class ClientController extends Controller
 
     public function show(Client $client): View
     {
-        MeasurementFormTemplate::ensureDefaultsForAuthenticatedTenant();
+        MeasurementFormTemplate::ensureDefaultsIfNeeded();
 
         $client->load([
             'measurements' => fn ($q) => $q->with('measurementTemplate')->orderByDesc('created_at'),
@@ -142,7 +142,6 @@ class ClientController extends Controller
         $tid = $request->input('measurement_form_template_id');
         if ($tid !== null && $tid !== '') {
             $template = MeasurementFormTemplate::query()->whereKey((int) $tid)->firstOrFail();
-            abort_unless((int) $template->tenant_id === (int) $request->user()->tenant_id, 403);
 
             return $this->validatedMeasurementForTemplate($request, $template);
         }

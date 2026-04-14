@@ -35,7 +35,7 @@ class OrderController extends Controller
 
     public function create(Request $request): View
     {
-        MeasurementFormTemplate::ensureDefaultsForAuthenticatedTenant();
+        MeasurementFormTemplate::ensureDefaultsIfNeeded();
 
         $clients = Client::query()->orderBy('name')->get();
         $employees = Employee::query()->orderBy('name')->get();
@@ -60,13 +60,11 @@ class OrderController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $tenantId = (int) $request->user()->tenant_id;
-
         $data = $request->validate([
             'client_id' => ['required', 'exists:clients,id'],
             'measurement_form_template_id' => [
                 'nullable',
-                Rule::exists('measurement_form_templates', 'id')->where(fn ($q) => $q->where('tenant_id', $tenantId)),
+                'exists:measurement_form_templates,id',
             ],
             'model_notes' => ['nullable', 'string'],
             'advance_payment_cents' => ['nullable', 'integer', 'min:0'],
@@ -83,14 +81,14 @@ class OrderController extends Controller
             'items.*.quantity' => ['nullable', 'integer', 'min:1'],
             'items.*.measurement_form_template_id' => [
                 'required',
-                Rule::exists('measurement_form_templates', 'id')->where(fn ($q) => $q->where('tenant_id', $tenantId)),
+                'exists:measurement_form_templates,id',
             ],
             'items.*.apply_discount' => ['nullable', 'boolean'],
             'items.*.client_supplies_fabric' => ['nullable', 'boolean'],
             'items.*.fabric_price_fcfa' => ['nullable', 'integer', 'min:0'],
             'items.*.inventory_item_id' => [
                 'nullable',
-                Rule::exists('inventory_items', 'id')->where(fn ($q) => $q->where('tenant_id', $tenantId)),
+                'exists:inventory_items,id',
             ],
             'items.*.inventory_characteristic_key' => ['nullable', 'string', 'max:64'],
             'items.*.inventory_consumed_meters' => ['nullable', 'numeric', 'min:0'],
@@ -98,7 +96,7 @@ class OrderController extends Controller
             'notes' => ['nullable', 'string'],
         ]);
 
-        $this->validateOrderFabricConsumptionFields($request, $tenantId);
+        $this->validateOrderFabricConsumptionFields($request);
 
         $reference = 'CMD-'.strtoupper(Str::random(8));
 
@@ -164,7 +162,7 @@ class OrderController extends Controller
 
     public function edit(Order $order): View
     {
-        MeasurementFormTemplate::ensureDefaultsForAuthenticatedTenant();
+        MeasurementFormTemplate::ensureDefaultsIfNeeded();
 
         $order->load(['images', 'items']);
         $clients = Client::query()->orderBy('name')->get();
@@ -182,13 +180,11 @@ class OrderController extends Controller
 
     public function update(Request $request, Order $order): RedirectResponse
     {
-        $tenantId = (int) $request->user()->tenant_id;
-
         $data = $request->validate([
             'client_id' => ['sometimes', 'exists:clients,id'],
             'measurement_form_template_id' => [
                 'nullable',
-                Rule::exists('measurement_form_templates', 'id')->where(fn ($q) => $q->where('tenant_id', $tenantId)),
+                'exists:measurement_form_templates,id',
             ],
             'model_notes' => ['nullable', 'string'],
             'advance_payment_cents' => ['nullable', 'integer', 'min:0'],
@@ -205,14 +201,14 @@ class OrderController extends Controller
             'items.*.quantity' => ['nullable', 'integer', 'min:1'],
             'items.*.measurement_form_template_id' => [
                 'required',
-                Rule::exists('measurement_form_templates', 'id')->where(fn ($q) => $q->where('tenant_id', $tenantId)),
+                'exists:measurement_form_templates,id',
             ],
             'items.*.apply_discount' => ['nullable', 'boolean'],
             'items.*.client_supplies_fabric' => ['nullable', 'boolean'],
             'items.*.fabric_price_fcfa' => ['nullable', 'integer', 'min:0'],
             'items.*.inventory_item_id' => [
                 'nullable',
-                Rule::exists('inventory_items', 'id')->where(fn ($q) => $q->where('tenant_id', $tenantId)),
+                'exists:inventory_items,id',
             ],
             'items.*.inventory_characteristic_key' => ['nullable', 'string', 'max:64'],
             'items.*.inventory_consumed_meters' => ['nullable', 'numeric', 'min:0'],
@@ -223,7 +219,7 @@ class OrderController extends Controller
             'remove_image_ids.*' => ['integer', Rule::exists('order_images', 'id')->where('order_id', $order->id)],
         ]);
 
-        $this->validateOrderFabricConsumptionFields($request, $tenantId);
+        $this->validateOrderFabricConsumptionFields($request);
 
         if (! empty($data['remove_image_ids'])) {
             $ids = $data['remove_image_ids'];
@@ -345,7 +341,7 @@ class OrderController extends Controller
     /**
      * Si un article avec champs nombre est lié (sans tissu client), exiger ligne + quantité prélevée.
      */
-    protected function validateOrderFabricConsumptionFields(Request $request, int $tenantId): void
+    protected function validateOrderFabricConsumptionFields(Request $request): void
     {
         $items = $request->input('items', []);
         if (! is_array($items)) {
@@ -367,7 +363,6 @@ class OrderController extends Controller
             }
 
             $item = InventoryItem::query()
-                ->where('tenant_id', $tenantId)
                 ->find((int) $rawInv);
 
             if ($item === null) {
@@ -421,7 +416,6 @@ class OrderController extends Controller
      */
     protected function syncOrderItems(Order $order, array $itemsRows, string $discountScope, int $discountPercent): void
     {
-        $tenantId = (int) $order->tenant_id;
         $scope = in_array($discountScope, ['order', 'all'], true) ? 'all' : $discountScope;
 
         $order->items()->delete();
@@ -433,7 +427,6 @@ class OrderController extends Controller
             }
 
             $template = MeasurementFormTemplate::query()
-                ->where('tenant_id', $tenantId)
                 ->whereKey($tplId)
                 ->first();
 
@@ -463,7 +456,7 @@ class OrderController extends Controller
             $charKey = null;
             $consumedMeters = null;
             if ($inventoryItemId !== null) {
-                $inv = InventoryItem::query()->where('tenant_id', $tenantId)->find($inventoryItemId);
+                $inv = InventoryItem::query()->find($inventoryItemId);
                 if ($inv !== null && $inv->hasNumericCharacteristicRows()) {
                     $k = trim((string) ($row['inventory_characteristic_key'] ?? ''));
                     $charKey = $k !== '' ? $k : null;
@@ -475,7 +468,6 @@ class OrderController extends Controller
             }
 
             OrderItem::query()->create([
-                'tenant_id' => $tenantId,
                 'order_id' => $order->id,
                 'inventory_item_id' => $inventoryItemId,
                 'inventory_characteristic_key' => $charKey,

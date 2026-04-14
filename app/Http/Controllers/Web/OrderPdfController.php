@@ -25,7 +25,7 @@ class OrderPdfController extends Controller
 
     private function renderPdf(Order $order): View|Response
     {
-        $order->load(['items.measurementTemplate', 'client', 'assignee', 'tenant']);
+        $order->load(['items.measurementTemplate', 'client', 'assignee']);
 
         if (request()->boolean('preview')) {
             return view('modules.orders.pdf', compact('order'));

@@ -2,16 +2,12 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class MeasurementFormTemplate extends Model
 {
-    use BelongsToTenant;
-
     protected $fillable = [
-        'tenant_id',
         'name',
         'slug',
         'notes',
@@ -61,9 +57,9 @@ class MeasurementFormTemplate extends Model
             ->all();
     }
 
-    public static function seedDefaultsForTenantId(int $tenantId): void
+    public static function seedDefaultsIfEmpty(): void
     {
-        if (static::query()->withoutGlobalScopes()->where('tenant_id', $tenantId)->exists()) {
+        if (static::query()->exists()) {
             return;
         }
 
@@ -106,8 +102,7 @@ class MeasurementFormTemplate extends Model
         ];
 
         foreach ($sets as $row) {
-            static::query()->withoutGlobalScopes()->create([
-                'tenant_id' => $tenantId,
+            static::query()->create([
                 'name' => $row['name'],
                 'fields' => $row['fields'],
                 'sort_order' => $row['sort_order'],
@@ -117,17 +112,12 @@ class MeasurementFormTemplate extends Model
         }
     }
 
-    public static function ensureDefaultsForAuthenticatedTenant(): void
+    public static function ensureDefaultsIfNeeded(): void
     {
-        $user = auth()->user();
-        if ($user === null || $user->tenant_id === null) {
+        if (auth()->user() === null) {
             return;
         }
 
-        if (static::query()->where('tenant_id', $user->tenant_id)->exists()) {
-            return;
-        }
-
-        static::seedDefaultsForTenantId((int) $user->tenant_id);
+        static::seedDefaultsIfEmpty();
     }
 }

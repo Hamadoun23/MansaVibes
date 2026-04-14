@@ -32,7 +32,6 @@ class FinanceCashMovementController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
-        $tenantId = (int) $request->user()->tenant_id;
         $data = $request->validate([
             'direction' => ['required', Rule::in(['in', 'out'])],
             'amount_fcfa' => ['required', 'numeric', 'min:0.01'],
@@ -40,7 +39,7 @@ class FinanceCashMovementController extends Controller
             'movement_date' => ['required', 'date'],
             'finance_category_id' => [
                 'nullable',
-                Rule::exists('finance_categories', 'id')->where(fn ($q) => $q->where('tenant_id', $tenantId)),
+                'exists:finance_categories,id',
             ],
             'notes' => ['nullable', 'string', 'max:2000'],
         ]);
@@ -66,7 +65,6 @@ class FinanceCashMovementController extends Controller
 
     public function update(Request $request, CashMovement $cashMovement): RedirectResponse
     {
-        $tenantId = (int) $request->user()->tenant_id;
         $data = $request->validate([
             'direction' => ['required', Rule::in(['in', 'out'])],
             'amount_fcfa' => ['required', 'numeric', 'min:0.01'],
@@ -74,7 +72,7 @@ class FinanceCashMovementController extends Controller
             'movement_date' => ['required', 'date'],
             'finance_category_id' => [
                 'nullable',
-                Rule::exists('finance_categories', 'id')->where(fn ($q) => $q->where('tenant_id', $tenantId)),
+                'exists:finance_categories,id',
             ],
             'notes' => ['nullable', 'string', 'max:2000'],
         ]);

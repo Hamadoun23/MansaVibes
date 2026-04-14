@@ -2,7 +2,6 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,10 +9,7 @@ use Illuminate\Support\Str;
 
 class InventoryItem extends Model
 {
-    use BelongsToTenant;
-
     protected $fillable = [
-        'tenant_id',
         'supplier_id',
         'inventory_form_template_id',
         'stock_type',

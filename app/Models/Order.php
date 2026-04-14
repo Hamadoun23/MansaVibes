@@ -2,17 +2,13 @@
 
 namespace App\Models;
 
-use App\Models\Concerns\BelongsToTenant;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Order extends Model
 {
-    use BelongsToTenant;
-
     protected $fillable = [
-        'tenant_id',
         'client_id',
         'reference',
         'model_name',
@@ -197,11 +193,6 @@ class Order extends Model
         $this->order_discount_cents = $totalDisc;
         $this->total_cents = max(0, $net);
         $this->saveQuietly();
-    }
-
-    public function tenant(): BelongsTo
-    {
-        return $this->belongsTo(Tenant::class);
     }
 
     public function client(): BelongsTo

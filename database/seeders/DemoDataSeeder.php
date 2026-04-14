@@ -2,10 +2,10 @@
 
 namespace Database\Seeders;
 
+use App\Models\AppSettings;
 use App\Models\Client;
 use App\Models\ClientMeasurement;
 use App\Models\MeasurementFormTemplate;
-use App\Models\Tenant;
 use App\Models\User;
 use Database\Seeders\Support\TenantBusinessDemoGenerator;
 use Faker\Factory as FakerFactory;
@@ -28,23 +28,26 @@ class DemoDataSeeder extends Seeder
 
     public function run(): void
     {
+        if (! app()->environment('local', 'testing')) {
+            return;
+        }
+
         $faker = FakerFactory::create('fr_FR');
 
-        $tenant = Tenant::query()->firstOrCreate(
-            ['slug' => 'demo-atelier'],
+        AppSettings::query()->updateOrCreate(
+            ['id' => 1],
             [
-                'name' => 'Maison Couleur — Dakar',
+                'business_name' => 'Maison Couleur — Dakar',
                 'settings' => ['city' => 'Dakar', 'country' => 'SN', 'phone' => '+221 33 000 00 00'],
             ],
         );
 
-        $this->clearTenantDemoData($tenant->id);
+        $this->clearDemoData();
 
-        MeasurementFormTemplate::seedDefaultsForTenantId((int) $tenant->id);
+        MeasurementFormTemplate::seedDefaultsIfEmpty();
 
         foreach ($this->demoAccounts() as $account) {
             User::query()->create([
-                'tenant_id' => $tenant->id,
                 'name' => $account['name'],
                 'email' => $account['email'],
                 'password' => 'password',
@@ -57,7 +60,6 @@ class DemoDataSeeder extends Seeder
         $clients = collect();
         foreach (range(1, 16) as $i) {
             $clients->push(Client::query()->create([
-                'tenant_id' => $tenant->id,
                 'name' => $faker->name(),
                 'phone' => '+221 '.random_int(70, 79).' '.$faker->numerify('### ## ##'),
                 'email' => $faker->unique()->safeEmail(),
@@ -75,7 +77,6 @@ class DemoDataSeeder extends Seeder
                 $epaule = $faker->randomFloat(2, 38, 52);
 
                 ClientMeasurement::query()->create([
-                    'tenant_id' => $tenant->id,
                     'client_id' => $client->id,
                     'label' => $faker->randomElement(['Couture femme', 'Costume homme', 'Enfant', 'Boubou', 'Ensemble cocktail']),
                     'data' => [
@@ -99,41 +100,44 @@ class DemoDataSeeder extends Seeder
             }
         }
 
-        (new TenantBusinessDemoGenerator($faker))->generate($tenant, $owner, $clients);
+        (new TenantBusinessDemoGenerator($faker))->generate($owner, $clients);
     }
 
-    protected function clearTenantDemoData(int $tenantId): void
+    protected function clearDemoData(): void
     {
-        DB::transaction(function () use ($tenantId): void {
-            DB::table('commerce_cart_items')->where('tenant_id', $tenantId)->delete();
-            DB::table('notification_logs')->where('tenant_id', $tenantId)->delete();
-            DB::table('reporting_snapshots')->where('tenant_id', $tenantId)->delete();
-            DB::table('product_images')->where('tenant_id', $tenantId)->delete();
-            DB::table('products')->where('tenant_id', $tenantId)->delete();
-            DB::table('payments')->where('tenant_id', $tenantId)->delete();
-            DB::table('invoice_items')->where('tenant_id', $tenantId)->delete();
-            DB::table('invoices')->where('tenant_id', $tenantId)->delete();
-            DB::table('quote_items')->where('tenant_id', $tenantId)->delete();
-            DB::table('quotes')->where('tenant_id', $tenantId)->delete();
-            DB::table('order_assignments')->where('tenant_id', $tenantId)->delete();
-            DB::table('order_status_histories')->where('tenant_id', $tenantId)->delete();
-            DB::table('order_images')->where('tenant_id', $tenantId)->delete();
-            DB::table('order_items')->where('tenant_id', $tenantId)->delete();
-            DB::table('orders')->where('tenant_id', $tenantId)->delete();
-            DB::table('stock_movements')->where('tenant_id', $tenantId)->delete();
-            DB::table('stock_alerts')->where('tenant_id', $tenantId)->delete();
-            DB::table('inventory_items')->where('tenant_id', $tenantId)->delete();
-            DB::table('cash_movements')->where('tenant_id', $tenantId)->delete();
-            DB::table('daily_cash_closures')->where('tenant_id', $tenantId)->delete();
-            DB::table('finance_categories')->where('tenant_id', $tenantId)->delete();
-            DB::table('staff_performances')->where('tenant_id', $tenantId)->delete();
-            DB::table('staff_tasks')->where('tenant_id', $tenantId)->delete();
-            DB::table('employees')->where('tenant_id', $tenantId)->delete();
-            DB::table('client_measurements')->where('tenant_id', $tenantId)->delete();
-            DB::table('measurement_form_templates')->where('tenant_id', $tenantId)->delete();
-            DB::table('clients')->where('tenant_id', $tenantId)->delete();
+        DB::transaction(function (): void {
+            DB::table('commerce_cart_items')->delete();
+            DB::table('notification_logs')->delete();
+            DB::table('reporting_snapshots')->delete();
+            DB::table('product_images')->delete();
+            DB::table('products')->delete();
+            DB::table('payments')->delete();
+            DB::table('invoice_items')->delete();
+            DB::table('invoices')->delete();
+            DB::table('quote_items')->delete();
+            DB::table('quotes')->delete();
+            DB::table('order_assignments')->delete();
+            DB::table('order_status_histories')->delete();
+            DB::table('order_images')->delete();
+            DB::table('order_items')->delete();
+            DB::table('orders')->delete();
+            DB::table('stock_movements')->delete();
+            DB::table('stock_alerts')->delete();
+            DB::table('inventory_items')->delete();
+            DB::table('cash_movements')->delete();
+            DB::table('daily_cash_closures')->delete();
+            DB::table('finance_categories')->delete();
+            DB::table('fixed_assets')->delete();
+            DB::table('staff_performances')->delete();
+            DB::table('staff_tasks')->delete();
+            DB::table('employees')->delete();
+            DB::table('client_measurements')->delete();
+            DB::table('measurement_form_templates')->delete();
+            DB::table('inventory_form_templates')->delete();
+            DB::table('clients')->delete();
 
-            User::query()->where('tenant_id', $tenantId)->delete();
+            $emails = collect($this->demoAccounts())->pluck('email')->all();
+            User::query()->whereIn('email', $emails)->delete();
         });
     }
 }

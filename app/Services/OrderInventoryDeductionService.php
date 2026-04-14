@@ -110,7 +110,6 @@ class OrderInventoryDeductionService
                     }
 
                     StockMovement::query()->create([
-                        'tenant_id' => $order->tenant_id,
                         'supplier_id' => null,
                         'inventory_item_id' => $inv->id,
                         'quantity_delta' => $result['quantity_delta'],
@@ -126,7 +125,6 @@ class OrderInventoryDeductionService
                     $inv->save();
 
                     StockMovement::query()->create([
-                        'tenant_id' => $order->tenant_id,
                         'supplier_id' => null,
                         'inventory_item_id' => $inv->id,
                         'quantity_delta' => -$qty,

@@ -45,7 +45,7 @@ class OrderWhatsAppController extends Controller
                 ->withErrors(['whatsapp_cloud' => 'API WhatsApp Cloud non configurée (voir .env : WHATSAPP_CLOUD_*).']);
         }
 
-        $order->load(['items.measurementTemplate', 'client', 'assignee', 'tenant']);
+        $order->load(['items.measurementTemplate', 'client', 'assignee']);
         $digits = $order->clientWhatsAppDigits();
         if ($digits === null) {
             return redirect()

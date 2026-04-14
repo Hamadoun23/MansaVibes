@@ -40,7 +40,7 @@ class OrderController extends Controller
             'items.*.unit_price_cents' => ['nullable', 'integer', 'min:0'],
         ]);
 
-        $this->assertClientInTenant($data['client_id']);
+        $this->assertClientExists($data['client_id']);
 
         $reference = $this->nextReference();
 
@@ -93,7 +93,7 @@ class OrderController extends Controller
         ]);
 
         if (isset($data['client_id'])) {
-            $this->assertClientInTenant((int) $data['client_id']);
+            $this->assertClientExists((int) $data['client_id']);
         }
 
         $previous = $order->status;
@@ -113,7 +113,7 @@ class OrderController extends Controller
         return response()->json(['ok' => true]);
     }
 
-    protected function assertClientInTenant(int $clientId): void
+    protected function assertClientExists(int $clientId): void
     {
         Client::query()->whereKey($clientId)->firstOrFail();
     }

@@ -28,7 +28,6 @@ use App\Models\StaffPerformance;
 use App\Models\StaffTask;
 use App\Models\StockAlert;
 use App\Models\StockMovement;
-use App\Models\Tenant;
 use App\Models\User;
 use Faker\Generator;
 use Illuminate\Support\Collection;
@@ -36,7 +35,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 /**
- * Données fictives pour tous les modules métier (hors clients), par tenant.
+ * Données fictives pour tous les modules métier (hors clients).
  */
 class TenantBusinessDemoGenerator
 {
@@ -45,29 +44,27 @@ class TenantBusinessDemoGenerator
     /**
      * @param  Collection<int, Client>  $clients
      */
-    public function generate(Tenant $tenant, User $actor, Collection $clients): void
+    public function generate(User $actor, Collection $clients): void
     {
         $faker = $this->faker;
 
         $employees = collect();
         foreach (['Maître tailleur', 'Styliste', 'Apprenti', 'Chef couturière', 'Brodeuse'] as $title) {
             $employees->push(Employee::query()->create([
-                'tenant_id' => $tenant->id,
                 'name' => $faker->name(),
                 'phone' => '+221 '.random_int(70, 79).' '.$faker->numerify('### ## ##'),
                 'role_title' => $title,
             ]));
         }
 
-        $catIn = FinanceCategory::query()->create(['tenant_id' => $tenant->id, 'name' => 'Ventes atelier', 'type' => 'income']);
-        $catOut = FinanceCategory::query()->create(['tenant_id' => $tenant->id, 'name' => 'Achats tissus', 'type' => 'expense']);
-        FinanceCategory::query()->create(['tenant_id' => $tenant->id, 'name' => 'Salaires & charges', 'type' => 'expense']);
-        FinanceCategory::query()->create(['tenant_id' => $tenant->id, 'name' => 'Loyer & utilitaires', 'type' => 'expense']);
+        $catIn = FinanceCategory::query()->create(['name' => 'Ventes atelier', 'type' => 'income']);
+        $catOut = FinanceCategory::query()->create(['name' => 'Achats tissus', 'type' => 'expense']);
+        FinanceCategory::query()->create(['name' => 'Salaires & charges', 'type' => 'expense']);
+        FinanceCategory::query()->create(['name' => 'Loyer & utilitaires', 'type' => 'expense']);
 
         foreach (range(1, 32) as $_) {
             $dir = $faker->randomElement(['in', 'out']);
             CashMovement::query()->create([
-                'tenant_id' => $tenant->id,
                 'finance_category_id' => $faker->randomElement([$catIn->id, $catOut->id, null]),
                 'direction' => $dir,
                 'amount_cents' => $dir === 'in'
@@ -83,14 +80,12 @@ class TenantBusinessDemoGenerator
         }
 
         DailyCashClosure::query()->create([
-            'tenant_id' => $tenant->id,
             'closed_on' => now()->subDay()->toDateString(),
             'opening_cents' => 125_000,
             'closing_cents' => 198_500,
             'notes' => 'Bonne affluence matinée.',
         ]);
         DailyCashClosure::query()->create([
-            'tenant_id' => $tenant->id,
             'closed_on' => now()->subDays(2)->toDateString(),
             'opening_cents' => 95_000,
             'closing_cents' => 142_000,
@@ -117,7 +112,6 @@ class TenantBusinessDemoGenerator
         $inventory = collect();
         foreach ($fabricStock as $row) {
             $inventory->push(InventoryItem::query()->create([
-                'tenant_id' => $tenant->id,
                 'inventory_form_template_id' => null,
                 'stock_type' => 'fabric',
                 'name' => $row['name'],
@@ -135,7 +129,6 @@ class TenantBusinessDemoGenerator
         }
         foreach ($accessoryStock as $row) {
             $inventory->push(InventoryItem::query()->create([
-                'tenant_id' => $tenant->id,
                 'inventory_form_template_id' => null,
                 'stock_type' => 'accessory',
                 'name' => $row['name'],
@@ -157,7 +150,6 @@ class TenantBusinessDemoGenerator
 
         foreach ($inventory->random(min(5, $inventory->count())) as $item) {
             StockAlert::query()->create([
-                'tenant_id' => $tenant->id,
                 'inventory_item_id' => $item->id,
                 'threshold' => 15,
                 'active' => true,
@@ -166,7 +158,6 @@ class TenantBusinessDemoGenerator
         foreach (range(1, 18) as $_) {
             $item = $inventory->random();
             StockMovement::query()->create([
-                'tenant_id' => $tenant->id,
                 'inventory_item_id' => $item->id,
                 'quantity_delta' => $faker->randomFloat(3, -25, 40),
                 'reason' => $faker->randomElement(['Réception fournisseur', 'Sortie commande', 'Inventaire', 'Perte']),
@@ -179,7 +170,6 @@ class TenantBusinessDemoGenerator
         ];
         foreach ($catalog as $pname) {
             $product = Product::query()->create([
-                'tenant_id' => $tenant->id,
                 'name' => $pname,
                 'slug' => Str::slug($pname).'-'.Str::lower(Str::random(6)),
                 'price_cents' => $faker->numberBetween(45_000, 320_000),
@@ -187,7 +177,6 @@ class TenantBusinessDemoGenerator
                 'is_active' => $faker->boolean(90),
             ]);
             ProductImage::query()->create([
-                'tenant_id' => $tenant->id,
                 'product_id' => $product->id,
                 'path' => 'demo/placeholder-'.Str::random(4).'.jpg',
                 'sort_order' => 0,
@@ -199,8 +188,7 @@ class TenantBusinessDemoGenerator
             'Robe wax empire', 'Grand boubou brodé', 'Costume 3 pièces', 'Jupe crayon + top',
             'Chemise traditionnelle', 'Tenue baptême fillette', 'Ensemble pagne tailleur',
         ];
-        $measurementTemplates = MeasurementFormTemplate::query()->withoutGlobalScopes()
-            ->where('tenant_id', $tenant->id)
+        $measurementTemplates = MeasurementFormTemplate::query()
             ->where('is_active', true)
             ->get();
         $tinyPng = base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAEhQGAhKmMIQAAAABJRU5ErkJggg==', true) ?: '';
@@ -210,7 +198,6 @@ class TenantBusinessDemoGenerator
             $emp = $faker->boolean(78) ? $employees->random() : null;
             $tpl = $measurementTemplates->isNotEmpty() ? $measurementTemplates->random() : null;
             $order = Order::query()->create([
-                'tenant_id' => $tenant->id,
                 'client_id' => $client->id,
                 'reference' => 'CMD-'.now()->format('Y').'-'.str_pad((string) $i, 4, '0', STR_PAD_LEFT),
                 'measurement_form_template_id' => $tpl?->id,
@@ -235,7 +222,6 @@ class TenantBusinessDemoGenerator
                     ? $measurementTemplates->random()->id
                     : null;
                 OrderItem::query()->create([
-                    'tenant_id' => $tenant->id,
                     'order_id' => $order->id,
                     'measurement_form_template_id' => $lineTpl,
                     'description' => $faker->randomElement([
@@ -272,7 +258,6 @@ class TenantBusinessDemoGenerator
                     $relPath = 'demo/orders/'.$order->id.'-'.$imgIdx.'-'.Str::random(4).'.png';
                     Storage::disk('public')->put($relPath, $tinyPng);
                     OrderImage::query()->create([
-                        'tenant_id' => $tenant->id,
                         'order_id' => $order->id,
                         'path' => $relPath,
                         'caption' => $faker->optional(0.4)->randomElement(['Vue face', 'Détail broderie', 'Dos']),
@@ -282,14 +267,12 @@ class TenantBusinessDemoGenerator
             }
 
             OrderStatusHistory::query()->create([
-                'tenant_id' => $tenant->id,
                 'order_id' => $order->id,
                 'status' => 'pending',
                 'user_id' => $actor->id,
             ]);
             if ($order->status !== 'pending') {
                 OrderStatusHistory::query()->create([
-                    'tenant_id' => $tenant->id,
                     'order_id' => $order->id,
                     'status' => 'in_progress',
                     'user_id' => $actor->id,
@@ -297,7 +280,6 @@ class TenantBusinessDemoGenerator
             }
             if (in_array($order->status, ['done', 'delivered'], true)) {
                 OrderStatusHistory::query()->create([
-                    'tenant_id' => $tenant->id,
                     'order_id' => $order->id,
                     'status' => $order->status,
                     'user_id' => $actor->id,
@@ -306,7 +288,6 @@ class TenantBusinessDemoGenerator
 
             if ($emp && $faker->boolean(35)) {
                 OrderAssignment::query()->create([
-                    'tenant_id' => $tenant->id,
                     'order_id' => $order->id,
                     'employee_id' => $emp->id,
                     'role' => $faker->randomElement(['Coupe', 'Montage', 'Finitions']),
@@ -317,7 +298,6 @@ class TenantBusinessDemoGenerator
         foreach (range(1, 6) as $n) {
             $qClient = $clients->random();
             $quote = Quote::query()->create([
-                'tenant_id' => $tenant->id,
                 'client_id' => $qClient->id,
                 'status' => $faker->randomElement(['draft', 'sent', 'accepted']),
                 'total_cents' => 0,
@@ -329,7 +309,6 @@ class TenantBusinessDemoGenerator
                 $up = $faker->numberBetween(25_000, 120_000);
                 $qt += $uq * $up;
                 QuoteItem::query()->create([
-                    'tenant_id' => $tenant->id,
                     'quote_id' => $quote->id,
                     'description' => $faker->randomElement(['Ensemble complet', 'Robe + voile', 'Tenue famille']),
                     'quantity' => $uq,
@@ -339,12 +318,11 @@ class TenantBusinessDemoGenerator
             $quote->update(['total_cents' => $qt]);
         }
 
-        $invBase = 200 + ($tenant->id * 50);
+        $invBase = 200;
         foreach ($clients->random(min(12, $clients->count())) as $c) {
             $invBase++;
             $status = $faker->randomElement(['draft', 'sent', 'paid']);
             $invoice = Invoice::query()->create([
-                'tenant_id' => $tenant->id,
                 'client_id' => $c->id,
                 'number' => 'FAC-'.now()->year.'-'.str_pad((string) $invBase, 4, '0', STR_PAD_LEFT),
                 'status' => $status,
@@ -352,7 +330,6 @@ class TenantBusinessDemoGenerator
             ]);
             $amount = $faker->numberBetween(28_000, 195_000);
             InvoiceItem::query()->create([
-                'tenant_id' => $tenant->id,
                 'invoice_id' => $invoice->id,
                 'description' => $faker->randomElement(['Prestation couture', 'Ensemble sur mesure', 'Retouches + matière']),
                 'quantity' => 1,
@@ -361,7 +338,6 @@ class TenantBusinessDemoGenerator
             $invoice->update(['total_cents' => $amount]);
             if ($status === 'paid') {
                 Payment::query()->create([
-                    'tenant_id' => $tenant->id,
                     'invoice_id' => $invoice->id,
                     'amount_cents' => $amount,
                     'paid_at' => $faker->dateTimeBetween('-30 days', 'now'),
@@ -372,7 +348,6 @@ class TenantBusinessDemoGenerator
 
         foreach ($employees as $employee) {
             StaffTask::query()->create([
-                'tenant_id' => $tenant->id,
                 'employee_id' => $employee->id,
                 'title' => $faker->sentence(3),
                 'status' => $faker->randomElement(['pending', 'in_progress', 'done']),
@@ -380,7 +355,6 @@ class TenantBusinessDemoGenerator
             ]);
             StaffPerformance::query()->updateOrCreate(
                 [
-                    'tenant_id' => $tenant->id,
                     'employee_id' => $employee->id,
                     'period_year' => (int) now()->year,
                     'period_month' => (int) now()->month,
@@ -390,7 +364,6 @@ class TenantBusinessDemoGenerator
         }
 
         ReportingSnapshot::query()->create([
-            'tenant_id' => $tenant->id,
             'period_start' => now()->startOfMonth()->toDateString(),
             'period_end' => now()->endOfMonth()->toDateString(),
             'metrics' => [
@@ -403,7 +376,6 @@ class TenantBusinessDemoGenerator
 
         foreach (range(1, 15) as $_) {
             NotificationLog::query()->create([
-                'tenant_id' => $tenant->id,
                 'channel' => $faker->randomElement(['sms', 'whatsapp', 'email']),
                 'recipient' => $faker->phoneNumber(),
                 'body' => $faker->randomElement([
@@ -416,10 +388,9 @@ class TenantBusinessDemoGenerator
             ]);
         }
 
-        $firstProduct = Product::query()->where('tenant_id', $tenant->id)->first();
+        $firstProduct = Product::query()->first();
         if ($firstProduct !== null) {
             CommerceCartItem::query()->create([
-                'tenant_id' => $tenant->id,
                 'session_id' => 'demo-session-'.Str::random(8),
                 'product_id' => $firstProduct->id,
                 'quantity' => 1,

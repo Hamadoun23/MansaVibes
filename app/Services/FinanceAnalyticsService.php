@@ -16,7 +16,6 @@ use Illuminate\Support\Facades\DB;
 class FinanceAnalyticsService
 {
     public function __construct(
-        protected int $tenantId,
         protected Carbon $from,
         protected Carbon $to,
         protected array $tenantSettings = []
@@ -89,7 +88,6 @@ class FinanceAnalyticsService
     protected function orderBaseQuery(): Builder
     {
         return Order::query()
-            ->where('tenant_id', $this->tenantId)
             ->whereBetween('created_at', [$this->from->copy()->startOfDay(), $this->to->copy()->endOfDay()])
             ->whereIn('status', ['delivered', 'validated', 'done']);
     }
@@ -102,12 +100,10 @@ class FinanceAnalyticsService
     protected function encaissementsCents(): int
     {
         $pay = (int) Payment::query()
-            ->where('tenant_id', $this->tenantId)
             ->whereBetween('paid_at', [$this->from->copy()->startOfDay(), $this->to->copy()->endOfDay()])
             ->sum('amount_cents');
 
         $cashIn = (int) CashMovement::query()
-            ->where('tenant_id', $this->tenantId)
             ->where('direction', 'in')
             ->whereBetween('movement_date', [$this->from->copy()->toDateString(), $this->to->copy()->toDateString()])
             ->sum('amount_cents');
@@ -118,7 +114,6 @@ class FinanceAnalyticsService
     protected function decaissementsCents(): int
     {
         return (int) CashMovement::query()
-            ->where('tenant_id', $this->tenantId)
             ->where('direction', 'out')
             ->whereBetween('movement_date', [$this->from->copy()->toDateString(), $this->to->copy()->toDateString()])
             ->sum('amount_cents');
@@ -127,12 +122,10 @@ class FinanceAnalyticsService
     protected function tresorerieNetteCents(): int
     {
         $in = (int) CashMovement::query()
-            ->where('tenant_id', $this->tenantId)
             ->where('direction', 'in')
             ->sum('amount_cents');
 
         $out = (int) CashMovement::query()
-            ->where('tenant_id', $this->tenantId)
             ->where('direction', 'out')
             ->sum('amount_cents');
 
@@ -142,7 +135,6 @@ class FinanceAnalyticsService
     protected function creancesCents(): int
     {
         return (int) Client::query()
-            ->where('tenant_id', $this->tenantId)
             ->where('balance_cents', '>', 0)
             ->sum('balance_cents');
     }
@@ -150,7 +142,6 @@ class FinanceAnalyticsService
     protected function avancesClientsCents(): int
     {
         return (int) abs(Client::query()
-            ->where('tenant_id', $this->tenantId)
             ->where('balance_cents', '<', 0)
             ->sum('balance_cents'));
     }
@@ -158,14 +149,12 @@ class FinanceAnalyticsService
     protected function immobilisationsBrutCents(): int
     {
         return (int) FixedAsset::query()
-            ->where('tenant_id', $this->tenantId)
             ->sum('amount_cents');
     }
 
     protected function payrollMonthlyCents(): int
     {
         return (int) Employee::query()
-            ->where('tenant_id', $this->tenantId)
             ->sum('monthly_salary_cents');
     }
 
@@ -173,7 +162,6 @@ class FinanceAnalyticsService
     protected function topModeles(): Collection
     {
         $rows = Order::query()
-            ->where('tenant_id', $this->tenantId)
             ->whereBetween('created_at', [$this->from->copy()->startOfDay(), $this->to->copy()->endOfDay()])
             ->whereIn('status', ['delivered', 'validated', 'done', 'in_progress'])
             ->select([
@@ -205,7 +193,6 @@ class FinanceAnalyticsService
     protected function topDepensesParCategorie(): Collection
     {
         $rows = CashMovement::query()
-            ->where('tenant_id', $this->tenantId)
             ->where('direction', 'out')
             ->whereBetween('movement_date', [$this->from->copy()->toDateString(), $this->to->copy()->toDateString()])
             ->select([
@@ -237,7 +224,6 @@ class FinanceAnalyticsService
     protected function journalLines(): Collection
     {
         $movements = CashMovement::query()
-            ->where('tenant_id', $this->tenantId)
             ->whereBetween('movement_date', [$this->from->copy()->toDateString(), $this->to->copy()->toDateString()])
             ->with('category')
             ->orderByDesc('movement_date')
@@ -252,7 +238,6 @@ class FinanceAnalyticsService
             ]);
 
         $payments = Payment::query()
-            ->where('tenant_id', $this->tenantId)
             ->whereBetween('paid_at', [$this->from->copy()->startOfDay(), $this->to->copy()->endOfDay()])
             ->with('invoice')
             ->orderByDesc('paid_at')
@@ -273,7 +258,6 @@ class FinanceAnalyticsService
         $start = $this->to->copy()->subMonths($months)->startOfMonth();
 
         $total = (int) Order::query()
-            ->where('tenant_id', $this->tenantId)
             ->where('created_at', '>=', $start)
             ->where('created_at', '<=', $this->to->copy()->endOfDay())
             ->whereIn('status', ['delivered', 'validated', 'done'])
@@ -287,7 +271,6 @@ class FinanceAnalyticsService
         $start = $this->to->copy()->subMonths($months)->startOfMonth();
 
         $total = (int) CashMovement::query()
-            ->where('tenant_id', $this->tenantId)
             ->where('direction', 'out')
             ->where('movement_date', '>=', $start->toDateString())
             ->where('movement_date', '<=', $this->to->copy()->toDateString())
@@ -301,13 +284,11 @@ class FinanceAnalyticsService
         $start = $this->to->copy()->subMonths($months)->startOfMonth();
 
         $pay = (int) Payment::query()
-            ->where('tenant_id', $this->tenantId)
             ->where('paid_at', '>=', $start)
             ->where('paid_at', '<=', $this->to->copy()->endOfDay())
             ->sum('amount_cents');
 
         $cash = (int) CashMovement::query()
-            ->where('tenant_id', $this->tenantId)
             ->where('direction', 'in')
             ->where('movement_date', '>=', $start->toDateString())
             ->where('movement_date', '<=', $this->to->copy()->toDateString())
