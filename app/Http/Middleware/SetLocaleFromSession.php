@@ -11,7 +11,9 @@ class SetLocaleFromSession
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $locale = $request->session()->get('locale', config('app.locale'));
+        $locale = $request->hasSession()
+            ? $request->session()->get('locale', config('app.locale'))
+            : config('app.locale');
         if (! in_array($locale, ['fr', 'en'], true)) {
             $locale = 'fr';
         }

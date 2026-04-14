@@ -32,11 +32,8 @@
             </a>
             <nav class="flex items-center gap-3 text-sm">
                 @if (Route::has('login'))
-                    <a href="{{ route('login') }}" class="text-white/70 hover:text-gold-300 transition">Connexion</a>
-                @endif
-                @if (Route::has('register'))
-                    <a href="{{ route('register') }}" class="inline-flex items-center px-4 py-2 rounded-lg bg-gold-500 text-mansa-black font-semibold hover:bg-gold-400 transition">
-                        Créer mon atelier
+                    <a href="{{ route('login') }}" class="inline-flex items-center px-4 py-2 rounded-lg bg-gold-500 text-mansa-black font-semibold hover:bg-gold-400 transition">
+                        Connexion
                     </a>
                 @endif
             </nav>
@@ -54,14 +51,9 @@
                 production et communication dans une seule application — pour des ateliers plus organisés et rentables.
             </p>
             <div class="mt-10 flex flex-wrap gap-4">
-                @if (Route::has('register'))
-                    <a href="{{ route('register') }}" class="inline-flex items-center px-6 py-3 rounded-xl bg-white text-mansa-black font-semibold hover:bg-gold-100 transition">
-                        Commencer gratuitement
-                    </a>
-                @endif
                 @if (Route::has('login'))
-                    <a href="{{ route('login') }}" class="inline-flex items-center px-6 py-3 rounded-xl border border-gold-500/40 text-white font-medium hover:bg-white/5 hover:border-gold-400/60 transition">
-                        J’ai déjà un compte
+                    <a href="{{ route('login') }}" class="inline-flex items-center px-6 py-3 rounded-xl bg-gold-500 text-mansa-black font-semibold hover:bg-gold-400 transition">
+                        Connexion
                     </a>
                 @endif
             </div>

@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-mansa-black leading-tight">
-            {{ __('tailor.workspace_title', ['name' => $employee->name, 'shop' => auth()->user()->tenant->name]) }}
+            {{ __('tailor.workspace_title', ['name' => $employee->name, 'shop' => \App\Support\CurrentTenant::get()?->name ?? auth()->user()->tenant->name]) }}
         </h2>
     </x-slot>
 

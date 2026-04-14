@@ -1,7 +1,7 @@
 <x-app-layout>
     <x-slot name="header">
         <h2 class="font-semibold text-xl text-mansa-black leading-tight">
-            Tableau de bord — {{ auth()->user()->tenant->name }}
+            Tableau de bord — {{ \App\Support\CurrentTenant::get()?->name ?? auth()->user()->tenant->name }}
         </h2>
     </x-slot>
 
