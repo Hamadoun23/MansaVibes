@@ -34,15 +34,15 @@ Route::get('/', function () {
     return view('welcome');
 })->name('home');
 
-Route::get('/dashboard', DashboardController::class)->middleware(['auth', 'verified'])->name('dashboard');
+Route::get('/dashboard', DashboardController::class)->middleware(['auth'])->name('dashboard');
 
-Route::get('/espace-tailleur', TailorWorkspaceController::class)->middleware(['auth', 'verified'])->name('tailor.workspace');
+Route::get('/espace-tailleur', TailorWorkspaceController::class)->middleware(['auth'])->name('tailor.workspace');
 
 Route::get('/share/orders/{order}/facture-pdf', [OrderPdfController::class, 'showShared'])
     ->name('orders.pdf.shared')
     ->middleware(['signed']);
 
-Route::middleware(['auth', 'verified'])->group(function () {
+Route::middleware(['auth'])->group(function () {
     Route::post('/locale', LocaleController::class)->name('locale.switch');
 
     Route::post('/espace-tailleur/commandes/{order}/valider', [TailorOrderController::class, 'validateOrder'])

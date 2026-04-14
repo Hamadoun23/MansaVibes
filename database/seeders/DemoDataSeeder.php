@@ -14,15 +14,15 @@ use Illuminate\Support\Facades\DB;
 
 class DemoDataSeeder extends Seeder
 {
-    /** @return list<array{email: string, name: string, role: string}> */
+    /** @return list<array{phone: string, name: string, role: string}> */
     private function demoAccounts(): array
     {
         return [
-            ['email' => 'proprietaire@demo.mansavibes.test', 'name' => 'Amadou Diallo', 'role' => 'owner'],
-            ['email' => 'manager@demo.mansavibes.test', 'name' => 'Fatou Ndiaye', 'role' => 'manager'],
-            ['email' => 'tailleur@demo.mansavibes.test', 'name' => 'Ibrahima Sow', 'role' => 'tailor'],
-            ['email' => 'comptable@demo.mansavibes.test', 'name' => 'Aissatou Ba', 'role' => 'accountant'],
-            ['email' => 'commercial@demo.mansavibes.test', 'name' => 'Moussa Kane', 'role' => 'sales'],
+            ['phone' => '770000001', 'name' => 'Amadou Diallo', 'role' => 'owner'],
+            ['phone' => '770000002', 'name' => 'Fatou Ndiaye', 'role' => 'manager'],
+            ['phone' => '770000003', 'name' => 'Ibrahima Sow', 'role' => 'tailor'],
+            ['phone' => '770000004', 'name' => 'Aissatou Ba', 'role' => 'accountant'],
+            ['phone' => '770000005', 'name' => 'Moussa Kane', 'role' => 'sales'],
         ];
     }
 
@@ -49,13 +49,13 @@ class DemoDataSeeder extends Seeder
         foreach ($this->demoAccounts() as $account) {
             User::query()->create([
                 'name' => $account['name'],
-                'email' => $account['email'],
+                'phone' => $account['phone'],
                 'password' => 'password',
                 'role' => $account['role'],
             ]);
         }
 
-        $owner = User::query()->where('email', 'proprietaire@demo.mansavibes.test')->firstOrFail();
+        $owner = User::query()->where('phone', '770000001')->firstOrFail();
 
         $clients = collect();
         foreach (range(1, 16) as $i) {
@@ -136,8 +136,8 @@ class DemoDataSeeder extends Seeder
             DB::table('inventory_form_templates')->delete();
             DB::table('clients')->delete();
 
-            $emails = collect($this->demoAccounts())->pluck('email')->all();
-            User::query()->whereIn('email', $emails)->delete();
+            $phones = collect($this->demoAccounts())->pluck('phone')->all();
+            User::query()->whereIn('phone', $phones)->delete();
         });
     }
 }

@@ -165,7 +165,7 @@
         <div class="pt-4 pb-3 border-t border-gold-600/25">
             <div class="px-4">
                 <div class="font-medium text-base text-white">{{ Auth::user()->name }}</div>
-                <div class="font-medium text-sm text-gold-200/80">{{ Auth::user()->email }}</div>
+                <div class="font-medium text-sm text-gold-200/80">{{ Auth::user()->phone }}</div>
             </div>
 
             <div class="mt-3 space-y-1 px-2">
