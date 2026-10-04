@@ -37,7 +37,11 @@ export const IntentSchema = z.object({
   amount: z.number().nullable(),
   payment_method: z.enum(payMethods).nullable(),
   status: z.enum(statuses).nullable(),
-  measurements: z.array(z.object({ key: z.enum(measurementKeys), value: z.number() })),
+  // le modèle renvoie parfois null quand il n'y a pas de mesures
+  measurements: z
+    .array(z.object({ key: z.enum(measurementKeys), value: z.number() }))
+    .nullable()
+    .transform((m) => m ?? []),
   page: z.enum(pages).nullable(),
   query: z.string().nullable(),
   notes: z.string().nullable(),
@@ -68,7 +72,7 @@ export const intentJsonSchema = {
     payment_method: nullableEnum(payMethods),
     status: nullableEnum(statuses),
     measurements: {
-      type: "array",
+      type: ["array", "null"],
       items: {
         type: "object",
         additionalProperties: false,
