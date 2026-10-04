@@ -27,7 +27,7 @@ export default function CashPage() {
       <PageBody className="grid gap-5 lg:grid-cols-[1fr_1.3fr] lg:items-start">
         <div className="space-y-4">
           <Card className="p-5 sm:p-6">
-            <p className="text-xs font-bold uppercase tracking-widest text-muted">Total encaissé</p>
+            <p className="font-mono text-[0.7rem] font-medium uppercase tracking-[0.12em] text-muted">Total encaissé</p>
             <p className="mt-2 font-display text-5xl font-semibold tracking-tight text-ink">{fcfa(total)}</p>
             <div className="mt-5 flex h-3 overflow-hidden rounded-full">
               {byMethod.map((x) => (
@@ -53,8 +53,8 @@ export default function CashPage() {
         </div>
 
         <section>
-          <h2 className="mb-3 text-sm font-bold uppercase tracking-widest text-muted">Mouvements · {payments.length}</h2>
-          <ul className="divide-y divide-line overflow-hidden rounded-3xl border border-line bg-surface">
+          <h2 className="mb-3 font-mono text-[0.72rem] font-medium uppercase tracking-[0.12em] text-muted">Mouvements · {payments.length}</h2>
+          <ul className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface">
             {[...payments].reverse().map((p) => {
               const order = orderById(p.orderId)!;
               const client = clientById(order.clientId)!;

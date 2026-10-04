@@ -38,7 +38,7 @@ export function ClientsList({ initialQuery = "" }: { initialQuery?: string }) {
         {Object.entries(groups).map(([letter, items]) => (
           <section key={letter}>
             <p className="mb-2 px-1 font-display text-lg font-semibold text-gold">{letter}</p>
-            <ul className="divide-y divide-line overflow-hidden rounded-3xl border border-line bg-surface">
+            <ul className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-surface">
               {items.map((c) => {
                 const os = ordersOf(c.id);
                 const due = os.reduce((s, o) => s + (o.price - o.paid), 0);
@@ -65,7 +65,7 @@ export function ClientsList({ initialQuery = "" }: { initialQuery?: string }) {
             </ul>
           </section>
         ))}
-        {list.length === 0 && <p className="rounded-3xl border border-dashed border-line p-10 text-center text-muted">Aucun client trouvé.</p>}
+        {list.length === 0 && <p className="rounded-2xl border border-dashed border-line p-10 text-center text-muted">Aucun client trouvé.</p>}
       </div>
     </div>
   );

@@ -49,6 +49,30 @@
   }
 }
 
+/* La landing garde sa palette claire, même si le téléphone est en mode sombre. */
+.theme-light {
+  --bg: #fbf7f0;
+  --surface: #ffffff;
+  --surface-2: #f4ede1;
+  --surface-3: #ece3d3;
+  --ink: #17142e;
+  --ink-soft: #3a3552;
+  --muted: #6e6880;
+  --line: #e6dccb;
+  --gold: #e3a33a;
+  --gold-soft: #fbe9c6;
+  --gold-ink: #2b1b02;
+  --clay: #c4512f;
+  --clay-soft: #f8dcd1;
+  --leaf: #1d8556;
+  --leaf-soft: #d5efe1;
+  --sky: #3a5bd9;
+  --sky-soft: #dde4fb;
+  --night: #14112a;
+  --night-2: #1d1938;
+  color-scheme: light;
+}
+
 @theme inline {
   --color-bg: var(--bg);
   --color-surface: var(--surface);
@@ -72,6 +96,7 @@
 
   --font-sans: var(--font-manrope), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-fraunces), ui-serif, Georgia, serif;
+  --font-mono: var(--font-plex-mono), ui-monospace, monospace;
 
   --animate-marquee: marquee 38s linear infinite;
   --animate-float: float 7s ease-in-out infinite;
@@ -166,3 +191,9 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* ───────────────────────── Lenis (défilement doux) ───────────────────────── */
+html.lenis, html.lenis body { height: auto; }
+.lenis:not(.lenis-autoToggle).lenis-stopped { overflow: clip; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-smooth iframe { pointer-events: none; }

@@ -58,8 +58,17 @@ function activeOrderOf(client: Client, garment: string | null): Order | null {
 const pageHref = { today: "/app", orders: "/app/commandes", clients: "/app/clients", cash: "/app/caisse" } as const;
 const pageLabel = { today: "Aujourd'hui", orders: "Commandes", clients: "Clients", cash: "Caisse" } as const;
 
-export function resolveIntent(i: Intent): AssistantAction {
-  const client = findClient(i.client_name);
+/** Filet de sécurité : un client connu cité dans la phrase, même si le modèle ne l'a pas relevé. */
+export function findClientInText(text: string | null | undefined): Client | null {
+  if (!text) return null;
+  const words = new Set(normalize(text).split(/\s+/));
+  const found = clients.filter((c) => normalize(c.name).split(/\s+/).some((t) => t.length > 3 && words.has(t)));
+  return found.length === 1 ? found[0] : null;
+}
+
+export function resolveIntent(i: Intent, transcript?: string): AssistantAction {
+  const needsClient = i.intent !== "chat" && i.intent !== "open_page";
+  const client = findClient(i.client_name) ?? (needsClient && !i.client_name ? findClientInText(i.query) ?? findClientInText(transcript) : null);
   const firstName = (client?.name ?? i.client_name ?? "").split(" ")[0];
   const notFound = (what: string): AssistantAction => ({
     kind: "navigate",

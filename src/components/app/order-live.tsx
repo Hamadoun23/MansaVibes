@@ -42,7 +42,7 @@ export function OrderLive({
   return (
     <div className="space-y-4">
       {suggested && (
-        <div className="flex items-center gap-3 rounded-3xl bg-gold-soft/60 p-4">
+        <div className="flex items-center gap-3 rounded-2xl bg-gold-soft/60 p-4">
           <Sparkles className="size-5 shrink-0 text-gold" />
           <p className="flex-1 text-sm font-semibold text-ink">
             Passée en « {statusMeta[status].label} » par l&apos;assistant.
@@ -63,7 +63,7 @@ export function OrderLive({
       {/* avancement */}
       <Card className="p-5">
         <div className="flex items-center justify-between">
-          <p className="text-xs font-bold uppercase tracking-widest text-muted">Avancement</p>
+          <p className="font-mono text-[0.7rem] font-medium uppercase tracking-[0.12em] text-muted">Avancement</p>
           <Badge tone={statusMeta[status].tone}>{statusMeta[status].label}</Badge>
         </div>
         <ol className="mt-5 flex items-center">
@@ -103,7 +103,7 @@ export function OrderLive({
         <div className="p-5">
           <div className="flex items-end justify-between gap-4">
             <div>
-              <p className="text-xs font-bold uppercase tracking-widest text-muted">Reste à payer</p>
+              <p className="font-mono text-[0.7rem] font-medium uppercase tracking-[0.12em] text-muted">Reste à payer</p>
               <p className={cn("mt-1 font-display text-4xl font-semibold tracking-tight", rest === 0 ? "text-leaf" : "text-ink")}>
                 {rest === 0 ? "Soldé" : fcfa(rest)}
               </p>
@@ -156,7 +156,7 @@ export function OrderLive({
 
       {/* whatsapp */}
       <Card className="p-5">
-        <p className="text-xs font-bold uppercase tracking-widest text-muted">Message prêt à envoyer</p>
+        <p className="font-mono text-[0.7rem] font-medium uppercase tracking-[0.12em] text-muted">Message prêt à envoyer</p>
         <p className="mt-3 rounded-2xl rounded-bl-md bg-[#d9fdd3] p-3.5 text-sm leading-relaxed text-[#111b21]">{message}</p>
         <a
           href={waHref}

@@ -37,14 +37,19 @@ function isoDate(d: Date) {
 
 /**
  * Analyse de secours, sans IA : repère téléphone, montants, jour, tenue, tissu et moyen de paiement.
- * Utilisée quand Claude n'est pas configuré ou ne répond pas.
+ * Utilisée quand l'assistant IA (Groq) n'est pas configuré ou ne répond pas.
  */
 export function parseDraftLocally(text: string, today = new Date()): OrderDraft {
-  const t = text.toLowerCase();
+  let t = text.toLowerCase();
   const draft: OrderDraft = { ...emptyDraft };
 
   const phone = text.match(/(?:\+?221\s?)?\b(7\d)[\s.-]?(\d{2,3})[\s.-]?(\d{2})[\s.-]?(\d{2,3})\b/);
-  if (phone) draft.phone = [phone[1], phone[2], phone[3], phone[4]].join(" ");
+  if (phone) {
+    draft.phone = [phone[1], phone[2], phone[3], phone[4]].join(" ");
+    // le numéro est masqué (même longueur) pour ne pas être lu comme un montant
+    const start = phone.index ?? 0;
+    t = t.slice(0, start) + " ".repeat(phone[0].length) + t.slice(start + phone[0].length);
+  }
 
   const name = text.match(/\b(?:client(?:e)?|madame|monsieur|mme|m\.)\s+([A-ZÀ-Ý][\p{L}'-]+(?:\s+[A-ZÀ-Ý][\p{L}'-]+)?)/u)
     ?? text.match(/\bpour\s+([A-ZÀ-Ý][\p{L}'-]+(?:\s+[A-ZÀ-Ý][\p{L}'-]+)?)/u);
@@ -62,7 +67,6 @@ export function parseDraftLocally(text: string, today = new Date()): OrderDraft 
   // montants : « 45 000 », « 45000 », « 45 mille »
   const amounts: { value: number; index: number }[] = [];
   for (const m of t.matchAll(/(\d{1,3}(?:[\s. ]\d{3})+|\d{4,7})(?:\s*(?:f|francs|fcfa))?/g)) {
-    if (draft.phone && m[0].replace(/\D/g, "").length >= 8) continue;
     amounts.push({ value: Number(m[1].replace(/\D/g, "")), index: m.index ?? 0 });
   }
   for (const m of t.matchAll(/(\d{1,3})\s*mille/g)) amounts.push({ value: Number(m[1]) * 1000, index: m.index ?? 0 });

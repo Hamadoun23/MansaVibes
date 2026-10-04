@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
 import { Logo } from "@/components/brand";
+import { WeaveDefs } from "@/components/landing/swatch";
 import { Avatar, ButtonLink } from "@/components/ui";
 import { atelier } from "@/lib/demo";
 import { cn } from "@/lib/utils";
@@ -25,11 +26,12 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <div className="min-h-dvh lg:grid lg:grid-cols-[16.5rem_1fr]">
+      <WeaveDefs />
       {/* barre latérale — ordinateur */}
       <aside className="sticky top-0 hidden h-dvh flex-col border-r border-line bg-surface/60 p-4 lg:flex">
         <Logo href="/app" className="px-2 py-1" />
         <div className="mt-6 rounded-2xl bg-surface-2 p-3">
-          <p className="text-[0.65rem] font-bold uppercase tracking-widest text-muted">Atelier</p>
+          <p className="font-mono text-[0.65rem] uppercase tracking-[0.12em] text-muted">Atelier</p>
           <p className="mt-0.5 truncate text-sm font-bold text-ink">{atelier.name}</p>
           <p className="truncate text-xs text-muted">Plan {atelier.plan} · essai 11 j</p>
         </div>
@@ -118,7 +120,7 @@ export function PageHeader({ title, subtitle, action, back }: { title: ReactNode
       <div className="mx-auto flex max-w-5xl items-center gap-3 px-4 pb-3 pt-[max(1rem,env(safe-area-inset-top))] sm:px-6 lg:px-8 lg:pt-6">
         {back}
         <div className="min-w-0 flex-1">
-          {subtitle && <p className="truncate text-xs font-bold uppercase tracking-widest text-muted">{subtitle}</p>}
+          {subtitle && <p className="truncate font-mono text-[0.7rem] font-medium uppercase tracking-[0.12em] text-muted">{subtitle}</p>}
           <h1 className="truncate font-display text-[1.75rem] font-semibold leading-tight tracking-tight text-ink sm:text-3xl">{title}</h1>
         </div>
         {action}

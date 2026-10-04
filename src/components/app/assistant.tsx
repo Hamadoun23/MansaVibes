@@ -63,6 +63,7 @@ export function Assistant() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ transcript, today: localToday() }),
+        signal: AbortSignal.timeout(25_000),
       });
       if (!res.ok) throw new Error(String(res.status));
       const data = (await res.json()) as { action: AssistantAction; source: "llm" | "local" };
@@ -98,7 +99,7 @@ export function Assistant() {
     return (
       <div className="mx-auto max-w-xl space-y-4">
         <Card className="p-4">
-          <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted">
+          <p className="flex items-center gap-2 font-mono text-[0.7rem] font-medium uppercase tracking-[0.12em] text-muted">
             <Mic className="size-3.5" /> Vous avez dit
           </p>
           <p className="mt-2 font-display text-lg leading-snug text-ink">« {sent} »</p>
@@ -162,7 +163,7 @@ export function Assistant() {
             rows={4}
             autoFocus
             placeholder={examples[0]}
-            className="w-full rounded-3xl border border-line bg-surface p-5 font-display text-xl leading-snug text-ink outline-none placeholder:text-muted/60 focus:border-gold focus:ring-4 focus:ring-gold/20"
+            className="w-full rounded-2xl border border-line bg-surface p-5 font-display text-xl leading-snug text-ink outline-none placeholder:text-muted/60 focus:border-gold focus:ring-4 focus:ring-gold/20"
           />
           <Button type="submit" size="lg" className="w-full" disabled={busy || !text.trim()}>
             {phase === "thinking" ? <Loader2 className="size-4 animate-spin" /> : <Sparkles className="size-4" />}
@@ -231,7 +232,7 @@ export function Assistant() {
                   <span key={i} className="flex-1 rounded-full bg-clay/80 transition-[height] duration-75" style={{ height: `${Math.max(8, l * 100)}%` }} />
                 ))}
               </div>
-              <p className="mt-6 min-h-[4.5rem] w-full rounded-3xl bg-surface p-4 text-left font-display text-lg leading-snug text-ink ring-1 ring-line" aria-live="polite">
+              <p className="mt-6 min-h-[4.5rem] w-full rounded-2xl bg-surface p-4 text-left font-display text-lg leading-snug text-ink ring-1 ring-line" aria-live="polite">
                 {dictation.finalText}
                 {dictation.interim && <span className="text-muted"> {dictation.interim}</span>}
                 {!dictation.transcript && <span className="text-muted">La transcription s&apos;affiche ici pendant que vous parlez…</span>}

@@ -82,7 +82,7 @@ function ReviewShell({
         {footer}
       </Card>
       {saved ? (
-        <div className="rounded-3xl bg-leaf p-5 text-white">
+        <div className="rounded-2xl bg-leaf p-5 text-white">
           <p className="flex items-center gap-2 font-display text-xl font-semibold">
             <Check className="size-5" /> {savedText}
           </p>
@@ -227,7 +227,7 @@ export function ClientReview({
           </div>
         )}
         <div>
-          <p className="mb-2 text-xs font-bold uppercase tracking-widest text-muted">Mesures · cm</p>
+          <p className="mb-2 font-mono text-[0.7rem] font-medium uppercase tracking-[0.12em] text-muted">Mesures · cm</p>
           <div className="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-3">
             {Object.entries(measures).map(([key, value]) => (
               <DraftField

@@ -7,6 +7,18 @@ const MODEL = process.env.GROQ_MODEL ?? "openai/gpt-oss-120b";
 
 let groq: Groq | null = null;
 
+/** Les 15 prochains jours avec leur nom : le modèle lit la date au lieu de la calculer (il se trompe souvent). */
+function buildCalendar(today: string) {
+  const start = new Date(`${today}T12:00:00`);
+  return Array.from({ length: 15 }, (_, i) => {
+    const d = new Date(start.getTime() + i * 864e5);
+    const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+    const name = d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
+    const tag = i === 0 ? " (aujourd'hui)" : i === 1 ? " (demain)" : i === 2 ? " (après-demain)" : i === 7 ? " (dans une semaine)" : "";
+    return `${iso} = ${name}${tag}`;
+  }).join("\n");
+}
+
 /** Sans LLM : on suppose une commande et on applique l'analyse par mots-clés. */
 function localIntent(transcript: string, today: string): Intent {
   const d = parseDraftLocally(transcript, new Date(`${today}T12:00:00`));
@@ -32,15 +44,15 @@ export async function POST(request: Request) {
   }
 
   try {
-    groq ??= new Groq();
-    const weekday = new Date(`${today}T12:00:00`).toLocaleDateString("fr-FR", { weekday: "long" });
+    groq ??= new Groq({ timeout: 15_000, maxRetries: 1 });
+    const calendar = buildCalendar(today);
     const completion = await groq.chat.completions.create({
       model: MODEL,
       temperature: 0.2,
       reasoning_effort: "low",
       messages: [
         { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: `Date du jour : ${weekday} ${today}\n\nNote du tailleur :\n${transcript}` },
+        { role: "user", content: `Calendrier :\n${calendar}\n\nNote du tailleur :\n${transcript}` },
       ],
       response_format: {
         type: "json_schema",
@@ -54,7 +66,16 @@ export async function POST(request: Request) {
       console.error("[assistant] réponse invalide du modèle", raw);
       return Response.json({ action: resolveIntent(localIntent(transcript, today)), source: "local" });
     }
-    return Response.json({ action: resolveIntent(parsed.data), source: "llm" });
+    // filets de sécurité : la date d'un jour cité (« vendredi », « demain ») est calculée ici, le modèle se trompe
+    // souvent d'un jour ; moyen de paiement et téléphone cités mais oubliés sont repris de la phrase.
+    const heard = parseDraftLocally(transcript, new Date(`${today}T12:00:00`));
+    const intent: Intent = {
+      ...parsed.data,
+      due_date: heard.due_date ?? parsed.data.due_date,
+      payment_method: parsed.data.payment_method ?? heard.payment_method,
+      phone: parsed.data.phone ?? heard.phone,
+    };
+    return Response.json({ action: resolveIntent(intent, transcript), source: "llm" });
   } catch (error) {
     if (error instanceof Groq.AuthenticationError) console.error("[assistant] clé GROQ_API_KEY invalide");
     else if (error instanceof Groq.RateLimitError) console.error("[assistant] quota Groq atteint");

@@ -41,3 +41,9 @@ yarn-error.log*
 next-env.d.ts
 !.env.example
 certificates/
+
+# tests
+/test-results/
+/playwright-report/
+/_shot.mjs
+/_scroll.mjs
