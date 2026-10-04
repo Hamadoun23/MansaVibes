@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { FallbackScreen, fallbackPrimary, HomeLink } from "@/components/fallbacks";
+import { FallbackScreen, HomeLink } from "@/components/fallbacks";
+import { Button } from "@/components/ui";
 
 export default function Error({ error, retry }: { error: Error & { digest?: string }; retry: () => void }) {
   useEffect(() => {
@@ -10,19 +11,16 @@ export default function Error({ error, retry }: { error: Error & { digest?: stri
 
   return (
     <FallbackScreen
-      fabric="indigo"
       code={error.digest ? `Incident ${error.digest}` : "Incident"}
       title={
         <>
-          Un fil a cassé. <em className="italic text-clay">On recoud ?</em>
+          Un fil a cassé. <span className="italic text-clay">On recoud ?</span>
         </>
       }
       text="Quelque chose s'est mal passé de notre côté. Vos données ne sont pas perdues : réessayez dans un instant."
       actions={
         <>
-          <button type="button" onClick={() => retry()} className={fallbackPrimary}>
-            Réessayer
-          </button>
+          <Button onClick={() => retry()}>Réessayer</Button>
           <HomeLink />
         </>
       }

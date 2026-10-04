@@ -42,7 +42,7 @@ export default async function ClientPage({ params }: PageProps<"/app/clients/[id
         title={client.name}
       />
       <PageBody className="space-y-5">
-        <div className="relative overflow-hidden rounded-2xl bg-night p-5 text-white grain sm:p-6">
+        <div className="relative overflow-hidden rounded-[2rem] bg-night p-5 text-white grain sm:p-6">
           <Bogolan className="text-gold/[0.07]" id="client-bogolan" />
           <div className="relative flex items-center gap-4">
             <Avatar name={client.name} size="lg" className="ring-4 ring-white/10" />
@@ -76,7 +76,7 @@ export default async function ClientPage({ params }: PageProps<"/app/clients/[id
         </div>
 
         <section>
-          <h2 className="mb-3 flex items-center gap-2 font-mono text-[0.72rem] font-medium uppercase tracking-[0.12em] text-muted">
+          <h2 className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-muted">
             <Ruler className="size-4 text-gold" /> Mesures <span className="font-semibold normal-case tracking-normal">· en cm</span>
           </h2>
           <Card className="grid grid-cols-2 gap-px overflow-hidden bg-line sm:grid-cols-3 lg:grid-cols-4">
@@ -90,14 +90,14 @@ export default async function ClientPage({ params }: PageProps<"/app/clients/[id
         </section>
 
         {client.notes && (
-          <div className="rounded-2xl bg-gold-soft/60 p-5">
-            <p className="font-mono text-[0.7rem] font-medium uppercase tracking-[0.12em] text-muted">Note</p>
+          <div className="rounded-3xl bg-gold-soft/60 p-5">
+            <p className="text-xs font-bold uppercase tracking-widest text-muted">Note</p>
             <p className="mt-1.5 font-display text-lg leading-snug text-ink">{client.notes}</p>
           </div>
         )}
 
         <section>
-          <h2 className="mb-3 font-mono text-[0.72rem] font-medium uppercase tracking-[0.12em] text-muted">Commandes</h2>
+          <h2 className="mb-3 text-sm font-bold uppercase tracking-widest text-muted">Commandes</h2>
           <div className="grid gap-2">
             {os.map((o) => (
               <OrderRow key={o.id} order={o} />

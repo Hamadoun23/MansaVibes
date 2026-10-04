@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 /** Toutes les pages s'ouvrent, sans erreur JavaScript ni débordement horizontal. */
 const routes = [
-  { path: "/", heading: /L'atelier/ },
+  { path: "/", heading: /Votre atelier/ },
   { path: "/connexion", heading: /Bon retour/ },
   { path: "/inscription", heading: /Ouvrez votre/ },
   { path: "/app", heading: /Bonjour Awa/ },

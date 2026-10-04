@@ -52,7 +52,7 @@ export default async function TrackingPage({ params }: PageProps<"/suivi/[token]
       </header>
 
       <main className="relative mx-auto -mt-16 max-w-md space-y-3 px-4">
-        <section className="rounded-2xl border border-line bg-surface p-5 shadow-xl">
+        <section className="rounded-[2rem] border border-line bg-surface p-5 shadow-xl">
           <div className="flex items-start justify-between gap-3">
             <div>
               <p className="font-display text-xl font-semibold text-ink">{order.garment}</p>
@@ -84,7 +84,7 @@ export default async function TrackingPage({ params }: PageProps<"/suivi/[token]
           </p>
         </section>
 
-        <section className="flex items-center justify-between rounded-2xl bg-night p-5 text-white">
+        <section className="flex items-center justify-between rounded-[2rem] bg-night p-5 text-white">
           <div>
             <p className="text-xs text-white/60">{rest > 0 ? "Reste à payer" : "Paiement"}</p>
             <p className="font-display text-2xl font-semibold">{rest > 0 ? fcfa(rest) : "Soldé ✓"}</p>
@@ -95,7 +95,7 @@ export default async function TrackingPage({ params }: PageProps<"/suivi/[token]
           {rest > 0 && <span className="rounded-full bg-gold px-4 py-2.5 text-sm font-bold text-gold-ink">Payer par Wave</span>}
         </section>
 
-        <details className="group rounded-2xl border border-line bg-surface">
+        <details className="group rounded-[2rem] border border-line bg-surface">
           <summary className="flex cursor-pointer list-none items-center gap-3 p-5 font-bold text-ink [&::-webkit-details-marker]:hidden">
             <Ruler className="size-4 text-gold" /> Mes mesures
             <span className="ml-auto text-sm text-muted transition group-open:rotate-180">⌄</span>

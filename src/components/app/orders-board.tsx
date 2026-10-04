@@ -88,7 +88,7 @@ export function OrdersBoard({ initialQuery = "" }: { initialQuery?: string }) {
           {statusOrder.slice(0, 5).map((s) => {
             const col = filtered.filter((o) => o.status === s);
             return (
-              <div key={s} className="rounded-2xl bg-surface-2 p-2">
+              <div key={s} className="rounded-3xl bg-surface-2 p-2">
                 <p className="flex items-center justify-between px-2 py-1.5 text-xs font-bold uppercase tracking-wider text-ink-soft">
                   {statusMeta[s].label}
                   <span className="text-muted">{col.length}</span>
@@ -121,5 +121,5 @@ export function OrdersBoard({ initialQuery = "" }: { initialQuery?: string }) {
 }
 
 function Empty() {
-  return <p className="rounded-2xl border border-dashed border-line p-10 text-center text-muted">Aucune commande ne correspond.</p>;
+  return <p className="rounded-3xl border border-dashed border-line p-10 text-center text-muted">Aucune commande ne correspond.</p>;
 }

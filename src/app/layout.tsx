@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, IBM_Plex_Mono, Manrope } from "next/font/google";
+import { Fraunces, Manrope } from "next/font/google";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -7,12 +7,6 @@ const fraunces = Fraunces({
   subsets: ["latin"],
   axes: ["SOFT", "opsz"],
   style: ["normal", "italic"],
-});
-
-const plexMono = IBM_Plex_Mono({
-  variable: "--font-plex-mono",
-  subsets: ["latin"],
-  weight: ["400", "500"],
 });
 
 const manrope = Manrope({
@@ -41,7 +35,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="fr" className={`${fraunces.variable} ${manrope.variable} ${plexMono.variable} antialiased`}>
+    <html lang="fr" className={`${fraunces.variable} ${manrope.variable} antialiased`}>
       <body className="min-h-dvh">{children}</body>
     </html>
   );

@@ -84,8 +84,8 @@ export default async function OrderPage({ params, searchParams }: PageProps<"/ap
           </Card>
 
           {client.notes && (
-            <div className="rounded-2xl bg-gold-soft/60 p-5">
-              <p className="font-mono text-[0.7rem] font-medium uppercase tracking-[0.12em] text-muted">Note</p>
+            <div className="rounded-3xl bg-gold-soft/60 p-5">
+              <p className="text-xs font-bold uppercase tracking-widest text-muted">Note</p>
               <p className="mt-1.5 font-display text-lg leading-snug text-ink">{client.notes}</p>
             </div>
           )}

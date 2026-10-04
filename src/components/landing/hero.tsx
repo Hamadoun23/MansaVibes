@@ -1,112 +1,131 @@
-"use client";
-
-import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import Link from "next/link";
-import { useRef } from "react";
-import { Label, RevealLines } from "./reveal";
-import { Swatch, fabricNames, type Fabric } from "./swatch";
-
-gsap.registerPlugin(ScrollTrigger, useGSAP);
-
-/** Échantillons épinglés comme sur le mur d'un atelier : position, rotation, vitesse de parallaxe. */
-const pinned: { fabric: Fabric; x: string; y: string; r: number; speed: number; w: string }[] = [
-  { fabric: "bogolan", x: "4%", y: "10%", r: -8, speed: 0.6, w: "38%" },
-  { fabric: "wax", x: "38%", y: "0%", r: 5, speed: 1.1, w: "40%" },
-  { fabric: "kente", x: "62%", y: "30%", r: -4, speed: 0.8, w: "34%" },
-  { fabric: "indigo", x: "18%", y: "46%", r: 7, speed: 1.4, w: "36%" },
-  { fabric: "bazin", x: "52%", y: "58%", r: -6, speed: 1, w: "38%" },
-];
+import { ArrowRight, Check, MessageCircle, Mic, Play, Star } from "lucide-react";
+import { Bogolan } from "@/components/brand";
+import { ButtonLink } from "@/components/ui";
+import { PhoneFrame, PhoneTodayScreen } from "./phone";
 
 export function Hero() {
-  const ref = useRef<HTMLElement>(null);
-
-  useGSAP(
-    () => {
-      const mm = gsap.matchMedia();
-      mm.add("(prefers-reduced-motion: no-preference)", () => {
-        // arrivée : les échantillons tombent sur le mur
-        gsap.from(".hero-swatch", {
-          y: 120,
-          opacity: 0,
-          rotate: (i) => pinned[i].r * 3,
-          duration: 1.4,
-          ease: "expo.out",
-          stagger: 0.08,
-          delay: 0.35,
-        });
-        gsap.from(".hero-fade", { opacity: 0, y: 16, duration: 1, ease: "power3.out", stagger: 0.1, delay: 0.7 });
-
-        // au scroll : parallaxe et dispersion des échantillons, le titre s'éloigne
-        const tl = gsap.timeline({ scrollTrigger: { trigger: ref.current, start: "top top", end: "bottom top", scrub: 0.6 } });
-        gsap.utils.toArray<HTMLElement>(".hero-swatch").forEach((el, i) => {
-          tl.to(el, { yPercent: -60 * pinned[i].speed, rotate: pinned[i].r * 2.2, ease: "none" }, 0);
-        });
-        tl.to(".hero-title", { yPercent: 18, opacity: 0.25, ease: "none" }, 0);
-      });
-    },
-    { scope: ref },
-  );
-
   return (
-    <section ref={ref} className="relative flex min-h-svh flex-col overflow-hidden bg-night pb-8 pt-28 text-[#f6ead2] sm:pt-32">
-      <div className="mx-auto grid w-full max-w-[90rem] flex-1 gap-10 px-4 sm:px-8 lg:grid-cols-[1.25fr_1fr] lg:gap-6">
-        <div className="flex flex-col">
-          <Label className="hero-fade text-[#f6ead2]/60">Logiciel pour ateliers de couture — Dakar · Bamako · Abidjan</Label>
-          <RevealLines
-            as="h1"
-            immediate
-            delay={0.1}
-            className="hero-title mt-8 font-display text-[clamp(3.6rem,12.5vw,11.5rem)] font-light leading-[0.86] tracking-[-0.045em]"
-            lines={[
-              "L'atelier,",
-              <>
-                sans le <em className="font-normal italic text-gold">cahier.</em>
-              </>,
-            ]}
-          />
-          <div className="mt-auto grid gap-8 pt-12 sm:grid-cols-[1fr_auto] sm:items-end">
-            <p className="hero-fade max-w-md text-lg leading-relaxed text-[#f6ead2]/70">
-              Mesures, commandes, acomptes Wave et Orange Money, messages WhatsApp. Dictez, Mansa Vibes remplit — depuis votre téléphone,
-              même quand le réseau est faible.
-            </p>
-            <div className="hero-fade flex flex-wrap gap-3">
-              <Link
-                href="/inscription"
-                className="group inline-flex h-14 items-center gap-3 rounded-full bg-gold pl-6 pr-2 font-semibold text-gold-ink transition hover:bg-[#f6ead2]"
-              >
-                Ouvrir mon atelier
-                <span className="grid size-10 place-items-center rounded-full bg-night text-gold transition-transform group-hover:rotate-[-45deg]">→</span>
-              </Link>
-              <Link href="/app" className="inline-flex h-14 items-center rounded-full border border-[#f6ead2]/25 px-6 font-semibold transition hover:border-[#f6ead2]">
-                Voir la démo
-              </Link>
+    <section className="relative overflow-hidden pb-16 pt-28 sm:pt-36 lg:pb-28">
+      {/* fond : halo + motif */}
+      <div aria-hidden className="absolute inset-0 -z-10">
+        <div className="absolute -right-40 -top-40 size-[42rem] rounded-full bg-gold/25 blur-[120px]" />
+        <div className="absolute -left-40 top-60 size-[30rem] rounded-full bg-clay/15 blur-[120px]" />
+        <Bogolan className="text-ink/[0.045] [mask-image:radial-gradient(ellipse_at_top,black,transparent_70%)]" id="hero-bogolan" />
+      </div>
+
+      <div className="container-page grid items-center gap-14 lg:grid-cols-[1.1fr_0.9fr] lg:gap-8">
+        <div className="animate-rise text-center lg:text-left">
+          <a
+            href="#assistant"
+            className="inline-flex items-center gap-2 rounded-full border border-line bg-surface/70 py-1.5 pl-1.5 pr-4 text-xs font-semibold text-ink-soft backdrop-blur transition hover:border-gold"
+          >
+            <span className="rounded-full bg-night px-2.5 py-1 text-[0.65rem] font-bold uppercase tracking-wider text-gold">Nouveau</span>
+            Dictez une commande, on remplit tout
+            <ArrowRight className="size-3.5" />
+          </a>
+
+          <h1 className="mt-7 font-display text-[2.85rem] font-medium leading-[0.98] tracking-[-0.03em] text-ink sm:text-6xl lg:text-[5.2rem]">
+            Votre atelier,
+            <br />
+            cousu{" "}
+            <span className="relative inline-block italic text-clay">
+              main
+              <svg viewBox="0 0 200 20" className="absolute -bottom-2 left-0 w-full text-gold" aria-hidden preserveAspectRatio="none">
+                <path d="M2 12 Q 50 2, 100 10 T 198 8" fill="none" stroke="currentColor" strokeWidth="3" strokeDasharray="7 6" strokeLinecap="round" />
+              </svg>
+            </span>
+            <br />
+            géré au doigt.
+          </h1>
+
+          <p className="mx-auto mt-7 max-w-xl text-lg leading-relaxed text-ink-soft lg:mx-0">
+            Mesures, commandes, acomptes Wave & Orange Money, rappels WhatsApp. Mansa Vibes remplace le cahier, la calculette et les
+            vocaux perdus — <strong className="text-ink">depuis votre téléphone, même avec une connexion faible.</strong>
+          </p>
+
+          <div className="mt-9 flex flex-col items-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
+            <ButtonLink href="/inscription" size="lg" className="w-full sm:w-auto">
+              Ouvrir mon atelier — gratuit
+              <ArrowRight className="size-4" />
+            </ButtonLink>
+            <ButtonLink href="/app" size="lg" variant="outline" className="w-full sm:w-auto">
+              <Play className="size-4 fill-current" />
+              Voir la démo
+            </ButtonLink>
+          </div>
+
+          <ul className="mt-7 flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-sm font-medium text-muted lg:justify-start">
+            {["14 jours offerts", "Sans carte bancaire", "Prêt en 2 minutes"].map((t) => (
+              <li key={t} className="flex items-center gap-1.5">
+                <Check className="size-4 text-leaf" />
+                {t}
+              </li>
+            ))}
+          </ul>
+
+          <div className="mt-10 flex items-center justify-center gap-4 lg:justify-start">
+            <div className="flex -space-x-2.5">
+              {["#e3a33a", "#c4512f", "#1d8556", "#3a5bd9"].map((c, i) => (
+                <span key={c} className="grid size-9 place-items-center rounded-full text-xs font-bold text-white ring-2 ring-bg" style={{ background: c }}>
+                  {["AN", "MD", "FS", "KB"][i]}
+                </span>
+              ))}
+            </div>
+            <div className="text-left">
+              <div className="flex gap-0.5 text-gold">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <Star key={i} className="size-3.5 fill-current" />
+                ))}
+              </div>
+              <p className="text-xs font-semibold text-muted">
+                <span className="text-ink">1 200+ ateliers</span> en Afrique de l&apos;Ouest
+              </p>
             </div>
           </div>
         </div>
 
-        {/* mur d'échantillons */}
-        <div className="relative h-[24rem] sm:h-[30rem] lg:h-auto" aria-hidden>
-          {pinned.map((s) => (
-            <figure
-              key={s.fabric}
-              className="hero-swatch absolute aspect-[4/5] overflow-hidden rounded-[3px] shadow-[0_30px_60px_-20px_rgba(0,0,0,0.6)]"
-              style={{ left: s.x, top: s.y, width: s.w, rotate: `${s.r}deg` }}
-            >
-              <Swatch fabric={s.fabric} />
-              <figcaption className="absolute bottom-0 left-0 right-0 bg-[#f6ead2] px-2 py-1 font-mono text-[0.6rem] uppercase tracking-[0.12em] text-night">
-                {fabricNames[s.fabric]}
-              </figcaption>
-              <span className="absolute left-1/2 top-2 size-2.5 -translate-x-1/2 rounded-full bg-[#f6ead2] shadow" />
-            </figure>
-          ))}
-        </div>
-      </div>
+        {/* visuel */}
+        <div className="relative mx-auto flex justify-center">
+          <div aria-hidden className="absolute inset-x-6 bottom-6 top-16 -z-10 rounded-[3rem] bg-night grain">
+            <Bogolan className="text-gold/10" id="hero-card-bogolan" />
+          </div>
+          <PhoneFrame className="animate-float-slow rotate-[-2deg]">
+            <PhoneTodayScreen />
+          </PhoneFrame>
 
-      <div className="hero-fade mx-auto mt-10 flex w-full max-w-[90rem] items-center justify-between px-4 font-mono text-[0.68rem] uppercase tracking-[0.14em] text-[#f6ead2]/45 sm:px-8">
-        <span>14 jours offerts · sans carte bancaire</span>
-        <span className="hidden sm:inline">Défiler ↓</span>
+          {/* cartes flottantes */}
+          <div className="absolute -left-4 top-24 w-52 animate-float rounded-2xl border border-line bg-surface/95 p-3 shadow-xl backdrop-blur sm:-left-16 sm:w-60">
+            <div className="flex items-center gap-2">
+              <span className="relative grid size-8 place-items-center rounded-full bg-gold text-gold-ink">
+                <span className="absolute inset-0 animate-pulse-ring rounded-full bg-gold" />
+                <Mic className="relative size-4" />
+              </span>
+              <div className="flex h-6 flex-1 items-center gap-[3px]">
+                {Array.from({ length: 18 }).map((_, i) => (
+                  <span key={i} className="wave-bar h-full w-[3px] rounded-full bg-ink/60" style={{ animationDelay: `${(i % 6) * 0.12}s` }} />
+                ))}
+              </div>
+            </div>
+            <p className="mt-2 text-[0.7rem] leading-snug text-ink-soft">« Boubou bazin pour Awa, samedi, 45 000, acompte 20 000 en Wave »</p>
+          </div>
+
+          <div className="absolute -right-2 bottom-28 w-56 animate-float rounded-2xl border border-line bg-surface/95 p-3 shadow-xl backdrop-blur [animation-delay:1.5s] sm:-right-14">
+            <div className="flex items-start gap-2.5">
+              <span className="grid size-8 shrink-0 place-items-center rounded-full bg-[#25d366] text-white">
+                <MessageCircle className="size-4" />
+              </span>
+              <div>
+                <p className="text-[0.7rem] font-bold text-ink">WhatsApp envoyé</p>
+                <p className="text-[0.7rem] leading-snug text-muted">Bonjour Khady, votre ensemble est prêt ✨ Reste : 15 000 F</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="absolute -right-1 top-10 rounded-2xl bg-leaf px-3.5 py-2.5 text-white shadow-xl animate-float [animation-delay:3s] sm:-right-6">
+            <p className="text-[0.6rem] font-bold uppercase tracking-wider opacity-80">Wave reçu</p>
+            <p className="font-display text-lg font-semibold">+20 000 F</p>
+          </div>
+        </div>
       </div>
     </section>
   );

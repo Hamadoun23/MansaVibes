@@ -4,7 +4,6 @@ import Link from "next/link";
 import { OrderRow } from "@/components/app/order-row";
 import { PageBody, PageHeader } from "@/components/app/shell";
 import { Bogolan } from "@/components/brand";
-import { Swatch } from "@/components/landing/swatch";
 import { Card } from "@/components/ui";
 import { atelier, todayStats, weekRevenue } from "@/lib/demo";
 import { cn, fcfa } from "@/lib/utils";
@@ -31,11 +30,11 @@ export default function TodayPage() {
       <PageBody className="space-y-6">
         {/* encaissements */}
         <section className="grid gap-4 lg:grid-cols-[1.4fr_1fr]">
-          <div className="relative overflow-hidden rounded-2xl bg-night p-5 text-white grain sm:p-6">
+          <div className="relative overflow-hidden rounded-[2rem] bg-night p-5 text-white grain sm:p-6">
             <Bogolan className="text-gold/[0.06]" id="today-bogolan" />
             <div className="relative flex items-start justify-between">
               <div>
-                <p className="font-mono text-[0.7rem] font-medium uppercase tracking-[0.12em] text-white/55">Encaissé aujourd&apos;hui</p>
+                <p className="text-xs font-bold uppercase tracking-widest text-white/55">Encaissé aujourd&apos;hui</p>
                 <p className="mt-2 font-display text-5xl font-semibold tracking-tight">
                   {fcfa(s.cashedToday, "")}
                   <span className="ml-1.5 text-xl text-gold">F</span>
@@ -48,7 +47,7 @@ export default function TodayPage() {
                 <ArrowUpRight className="size-5" />
               </Link>
             </div>
-            <div className="relative mt-6 flex h-28 items-end gap-2">
+            <div className="relative mt-6 flex h-24 items-end gap-2">
               {weekRevenue.map((d, i) => (
                 <div key={d.day} className="flex h-full flex-1 flex-col items-center justify-end gap-1.5">
                   <div
@@ -74,13 +73,11 @@ export default function TodayPage() {
         {/* dictée */}
         <Link
           href="/app/assistant"
-          className="group flex items-center gap-4 overflow-hidden rounded-2xl border border-line bg-surface p-2 pr-5 transition hover:border-ink/25"
+          className="group flex items-center gap-4 rounded-[2rem] border border-dashed border-gold bg-gold-soft/50 p-4 transition hover:bg-gold-soft"
         >
-          <span className="relative grid h-16 w-20 shrink-0 place-items-center overflow-hidden rounded-xl">
-            <Swatch fabric="wax" className="absolute inset-0" />
-            <span className="relative grid size-10 place-items-center rounded-full bg-night text-gold">
-              <Mic className="size-4" />
-            </span>
+          <span className="relative grid size-12 shrink-0 place-items-center rounded-full bg-gold text-gold-ink">
+            <span className="absolute inset-0 animate-pulse-ring rounded-full bg-gold" />
+            <Mic className="relative size-5" />
           </span>
           <div className="min-w-0">
             <p className="font-bold text-ink">Nouvelle commande ? Dites-la.</p>
@@ -119,7 +116,7 @@ function Stat({ label, value, tone, icon: Icon }: { label: string; value: string
 function TaskGroup({ title, icon: Icon, tone, orders, empty }: { title: string; icon: typeof AlarmClock; tone: string; orders: ReturnType<typeof todayStats>["late"]; empty: string }) {
   return (
     <section>
-      <h2 className="mb-3 flex items-center gap-2 font-mono text-[0.72rem] font-medium uppercase tracking-[0.12em] text-muted">
+      <h2 className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-widest text-muted">
         <Icon className={cn("size-4", tone)} />
         {title}
         <span className="rounded-full bg-surface-2 px-2 py-0.5 text-xs text-ink">{orders.length}</span>

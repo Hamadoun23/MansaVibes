@@ -24,7 +24,7 @@ export function Logo({ href = "/", className, light }: { href?: string; classNam
     <Link href={href} className={cn("group inline-flex items-center gap-2.5", className)} aria-label="Mansa Vibes, accueil">
       <LogoMark className="transition-transform duration-300 group-hover:-rotate-6" />
       <span className={cn("font-display text-[1.35rem] font-semibold tracking-tight", light ? "text-white" : "text-ink")}>
-        Mansa Vibes
+        Mansa<span className="text-gold">.</span>Vibes
       </span>
     </Link>
   );

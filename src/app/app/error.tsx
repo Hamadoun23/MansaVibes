@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
-import { FallbackScreen, fallbackPrimary, HomeLink } from "@/components/fallbacks";
+import { FallbackScreen, HomeLink } from "@/components/fallbacks";
+import { Button } from "@/components/ui";
 
-/** Erreur dans l'application : la barre de navigation reste en place, seul le contenu est remplacé. */
+/** Erreur dans l'application : la navigation reste en place, seul le contenu est remplacé. */
 export default function AppError({ error, retry }: { error: Error & { digest?: string }; retry: () => void }) {
   useEffect(() => {
     console.error(error);
@@ -11,19 +12,12 @@ export default function AppError({ error, retry }: { error: Error & { digest?: s
 
   return (
     <FallbackScreen
-      fabric="indigo"
       code={error.digest ? `Incident ${error.digest}` : "Incident"}
-      title={
-        <>
-          Cet écran n&apos;a pas pu s&apos;ouvrir.
-        </>
-      }
+      title={<>Cet écran n&apos;a pas pu s&apos;ouvrir.</>}
       text="Vérifiez la connexion puis réessayez. Le reste de l'atelier fonctionne normalement."
       actions={
         <>
-          <button type="button" onClick={() => retry()} className={fallbackPrimary}>
-            Réessayer
-          </button>
+          <Button onClick={() => retry()}>Réessayer</Button>
           <HomeLink href="/app">Aujourd&apos;hui</HomeLink>
         </>
       }

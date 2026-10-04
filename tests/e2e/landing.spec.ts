@@ -20,18 +20,18 @@ test("les appels à l'action mènent à l'inscription et à la démo", async ({ 
 });
 
 test("FAQ : une question s'ouvre au clic", async ({ page }) => {
-  await page.goto("/#questions");
-  const q = page.locator("details").filter({ hasText: "Et sans connexion ?" });
+  await page.goto("/#faq");
+  const q = page.locator("details").filter({ hasText: "Et si je n'ai pas de connexion ?" });
   await q.locator("summary").click();
-  await expect(q.getByText(/synchronise quand le réseau revient/)).toBeVisible();
+  await expect(q.getByText(/synchronise dès que le réseau revient/)).toBeVisible();
 });
 
 test("mobile : le menu plein écran s'ouvre et se ferme", async ({ page, isMobile }) => {
   test.skip(!isMobile, "menu réservé au mobile");
   await page.goto("/");
   await page.getByRole("button", { name: "Ouvrir le menu" }).click();
-  const link = page.getByRole("link", { name: /Tarifs/ }).last();
-  await expect(link).toBeVisible();
+  const menuLinks = page.locator("header").getByRole("link", { name: "Tarifs" });
+  await expect(menuLinks.first()).toBeVisible();
   await page.getByRole("button", { name: "Fermer le menu" }).click();
-  await expect(page.getByRole("button", { name: "Fermer le menu" })).not.toBeInViewport();
+  await expect(menuLinks).toHaveCount(0);
 });
