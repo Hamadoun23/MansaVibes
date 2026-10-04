@@ -7,7 +7,9 @@ import { clients } from "@/lib/demo";
 
 export const metadata: Metadata = { title: "Clients" };
 
-export default function ClientsPage() {
+export default async function ClientsPage({ searchParams }: PageProps<"/app/clients">) {
+  const q = (await searchParams).q;
+  const initialQuery = typeof q === "string" ? q : "";
   return (
     <>
       <PageHeader
@@ -21,7 +23,7 @@ export default function ClientsPage() {
         }
       />
       <PageBody>
-        <ClientsList />
+        <ClientsList key={initialQuery} initialQuery={initialQuery} />
       </PageBody>
     </>
   );

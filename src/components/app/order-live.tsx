@@ -1,17 +1,31 @@
 "use client";
 
-import { Check, MessageCircle, Plus, Wallet, X } from "lucide-react";
+import { Check, MessageCircle, Plus, Sparkles, Wallet, X } from "lucide-react";
 import { useState } from "react";
 import { Badge, Button, Card } from "@/components/ui";
-import { payMethodLabel, statusMeta, statusOrder, type Client, type Order, type PayMethod, type Payment } from "@/lib/demo";
+import { payMethodLabel, statusMeta, statusOrder, type Client, type Order, type OrderStatus, type PayMethod, type Payment } from "@/lib/demo";
 import { cn, fcfa } from "@/lib/utils";
 
 /** Partie interactive d'une commande : avancement, encaissement, message WhatsApp (état local en démo). */
-export function OrderLive({ order, client, initialPayments }: { order: Order; client: Client; initialPayments: Payment[] }) {
-  const [status, setStatus] = useState(order.status);
+/** Pré-remplissage venu de l'assistant vocal (paramètres d'URL). */
+export type AssistantSuggestion = { status?: OrderStatus; cash?: { amount: number; method: PayMethod | null } };
+
+export function OrderLive({
+  order,
+  client,
+  initialPayments,
+  suggestion,
+}: {
+  order: Order;
+  client: Client;
+  initialPayments: Payment[];
+  suggestion?: AssistantSuggestion;
+}) {
+  const [status, setStatus] = useState(suggestion?.status ?? order.status);
   const [payments, setPayments] = useState(initialPayments);
   const [paidExtra, setPaidExtra] = useState(0);
-  const [cashOpen, setCashOpen] = useState(false);
+  const [cashOpen, setCashOpen] = useState(Boolean(suggestion?.cash));
+  const [suggested, setSuggested] = useState(Boolean(suggestion?.status && suggestion.status !== order.status));
 
   const paid = order.paid + paidExtra;
   const rest = Math.max(0, order.price - paid);
@@ -27,6 +41,25 @@ export function OrderLive({ order, client, initialPayments }: { order: Order; cl
 
   return (
     <div className="space-y-4">
+      {suggested && (
+        <div className="flex items-center gap-3 rounded-3xl bg-gold-soft/60 p-4">
+          <Sparkles className="size-5 shrink-0 text-gold" />
+          <p className="flex-1 text-sm font-semibold text-ink">
+            Passée en « {statusMeta[status].label} » par l&apos;assistant.
+          </p>
+          <button
+            type="button"
+            onClick={() => {
+              setStatus(order.status);
+              setSuggested(false);
+            }}
+            className="text-sm font-bold text-clay hover:underline"
+          >
+            Annuler
+          </button>
+        </div>
+      )}
+
       {/* avancement */}
       <Card className="p-5">
         <div className="flex items-center justify-between">
@@ -103,6 +136,8 @@ export function OrderLive({ order, client, initialPayments }: { order: Order; cl
             {cashOpen ? (
               <CashForm
                 rest={rest}
+                initialAmount={suggestion?.cash?.amount}
+                initialMethod={suggestion?.cash?.method ?? undefined}
                 onCancel={() => setCashOpen(false)}
                 onSubmit={(amount, method) => {
                   setPaidExtra((x) => x + amount);
@@ -136,9 +171,21 @@ export function OrderLive({ order, client, initialPayments }: { order: Order; cl
   );
 }
 
-function CashForm({ rest, onSubmit, onCancel }: { rest: number; onSubmit: (amount: number, method: PayMethod) => void; onCancel: () => void }) {
-  const [amount, setAmount] = useState(String(rest));
-  const [method, setMethod] = useState<PayMethod>("wave");
+function CashForm({
+  rest,
+  initialAmount,
+  initialMethod,
+  onSubmit,
+  onCancel,
+}: {
+  rest: number;
+  initialAmount?: number;
+  initialMethod?: PayMethod;
+  onSubmit: (amount: number, method: PayMethod) => void;
+  onCancel: () => void;
+}) {
+  const [amount, setAmount] = useState(String(Math.min(initialAmount ?? rest, rest)));
+  const [method, setMethod] = useState<PayMethod>(initialMethod ?? "wave");
   const value = Number(amount.replace(/\D/g, ""));
 
   return (

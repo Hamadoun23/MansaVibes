@@ -2,10 +2,10 @@ import { ArrowLeft, Link2, Phone, Scissors, Shirt, User } from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { OrderLive } from "@/components/app/order-live";
+import { OrderLive, type AssistantSuggestion } from "@/components/app/order-live";
 import { PageBody, PageHeader } from "@/components/app/shell";
 import { Avatar, Card } from "@/components/ui";
-import { clientById, orderById, orders, paymentsOf } from "@/lib/demo";
+import { clientById, orderById, orders, paymentsOf, statusOrder, type OrderStatus, type PayMethod } from "@/lib/demo";
 import { dueLabel } from "@/lib/utils";
 
 export function generateStaticParams() {
@@ -18,10 +18,25 @@ export async function generateMetadata({ params }: PageProps<"/app/commandes/[id
   return { title: order ? `${order.ref} · ${order.garment}` : "Commande" };
 }
 
-export default async function OrderPage({ params }: PageProps<"/app/commandes/[id]">) {
+const payMethods: PayMethod[] = ["wave", "orange", "especes", "carte"];
+
+/** Lit le pré-remplissage envoyé par l'assistant : ?statut=prete, ?encaisser=15000&mode=wave */
+function readSuggestion(sp: Record<string, string | string[] | undefined>): AssistantSuggestion | undefined {
+  const one = (v: string | string[] | undefined) => (Array.isArray(v) ? v[0] : v);
+  const statut = one(sp.statut);
+  const amount = Number(one(sp.encaisser));
+  const mode = one(sp.mode);
+  const suggestion: AssistantSuggestion = {};
+  if (statut && (statusOrder as string[]).includes(statut)) suggestion.status = statut as OrderStatus;
+  if (amount > 0) suggestion.cash = { amount, method: mode && (payMethods as string[]).includes(mode) ? (mode as PayMethod) : null };
+  return suggestion.status || suggestion.cash ? suggestion : undefined;
+}
+
+export default async function OrderPage({ params, searchParams }: PageProps<"/app/commandes/[id]">) {
   const { id } = await params;
   const order = orderById(id);
   if (!order) notFound();
+  const suggestion = readSuggestion(await searchParams);
   const client = clientById(order.clientId)!;
 
   return (
@@ -36,7 +51,7 @@ export default async function OrderPage({ params }: PageProps<"/app/commandes/[i
         title={order.garment}
       />
       <PageBody className="grid gap-4 lg:grid-cols-[1.3fr_1fr] lg:items-start">
-        <OrderLive order={order} client={client} initialPayments={paymentsOf(order.id)} />
+        <OrderLive key={JSON.stringify(suggestion ?? null)} order={order} client={client} initialPayments={paymentsOf(order.id)} suggestion={suggestion} />
 
         <div className="space-y-4">
           <Card className="p-5">

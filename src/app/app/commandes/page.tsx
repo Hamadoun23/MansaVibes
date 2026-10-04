@@ -5,13 +5,15 @@ import { orders } from "@/lib/demo";
 
 export const metadata: Metadata = { title: "Commandes" };
 
-export default function OrdersPage() {
+export default async function OrdersPage({ searchParams }: PageProps<"/app/commandes">) {
+  const q = (await searchParams).q;
+  const initialQuery = typeof q === "string" ? q : "";
   const active = orders.filter((o) => o.status !== "livree").length;
   return (
     <>
       <PageHeader subtitle={`${active} en cours`} title="Commandes" action={<NewOrderButton />} />
       <PageBody>
-        <OrdersBoard />
+        <OrdersBoard key={initialQuery} initialQuery={initialQuery} />
       </PageBody>
     </>
   );

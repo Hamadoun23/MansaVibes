@@ -10,9 +10,9 @@ import { OrderRow } from "./order-row";
 
 type Filter = "toutes" | "retard" | OrderStatus;
 
-export function OrdersBoard() {
+export function OrdersBoard({ initialQuery = "" }: { initialQuery?: string }) {
   const [filter, setFilter] = useState<Filter>("toutes");
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState(initialQuery);
   const [view, setView] = useState<"liste" | "atelier">("liste");
 
   const filtered = useMemo(() => {

@@ -7,8 +7,8 @@ import { Avatar } from "@/components/ui";
 import { clients, ordersOf } from "@/lib/demo";
 import { fcfa } from "@/lib/utils";
 
-export function ClientsList() {
-  const [query, setQuery] = useState("");
+export function ClientsList({ initialQuery = "" }: { initialQuery?: string }) {
+  const [query, setQuery] = useState(initialQuery);
   const q = query.trim().toLowerCase();
   const list = clients
     .filter((c) => !q || `${c.name} ${c.phone} ${c.city}`.toLowerCase().includes(q))
