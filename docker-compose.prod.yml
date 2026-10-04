@@ -1,0 +1,11 @@
+# Production sur le VPS : le nginx de l'hôte termine le HTTPS et redirige vers 127.0.0.1:8500.
+#   docker compose -f docker-compose.prod.yml up -d --build
+# Secrets dans .env.prod (jamais commité) : GROQ_API_KEY=...
+services:
+  web:
+    build: .
+    image: mansavibes-web
+    restart: unless-stopped
+    env_file: .env.prod
+    ports:
+      - "127.0.0.1:8500:3000"
